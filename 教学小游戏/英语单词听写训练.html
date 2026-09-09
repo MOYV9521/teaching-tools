@@ -21,7 +21,8 @@
   .bar { height:8px; border-radius:99px; background:rgba(255,255,255,.12); overflow:hidden; margin:6px 0 18px; }
   .bar i { display:block; height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#2dd4bf); transition:width .5s; border-radius:99px; }
 
-  .levelrow { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .levelrow { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+  .lvlcap { font-size:13px; color:#99f6e4; letter-spacing:1px; margin-right:2px; }
   .lvl { padding:7px 14px; border-radius:99px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.08);
     color:#fff; font-size:13px; cursor:pointer; transition:.15s; }
   .lvl:hover { background:rgba(255,255,255,.16); }
@@ -88,8 +89,10 @@
   <div class="bar"><i id="barI"></i></div>
 
   <div class="levelrow">
-    <button class="lvl on" data-lv="primary">🏫 小学词表</button>
-    <button class="lvl" data-lv="junior">🎒 初中词表</button>
+    <span class="lvlcap">📚 切换难度</span>
+    <button class="lvl on" data-lv="primary">🎈 小学</button>
+    <button class="lvl" data-lv="junior">📘 初中</button>
+    <button class="lvl" data-lv="senior">🎓 高中</button>
   </div>
 
   <div class="playzone">
@@ -109,13 +112,13 @@
       <span class="cn" id="ansCn"></span>
     </div>
   </div>
-  <footer>每局 10 题 · 小学 / 初中词表任选 · 听清每一个音节，拼出正确单词</footer>
+  <footer>每局 10 题 · 难度任选（小学 / 初中 / 高中）· 听清每一个音节，拼出正确单词</footer>
 </div>
 
 <!-- 开始 -->
 <div class="ov" id="ovStart">
   <h2>🎧 英语单词听写训练</h2>
-  <p>系统会<b>用标准英语朗读</b>单词，你听音拼写、即时判分。<br>可选<b>小学 / 初中</b>词表，锻炼耳朵和拼写双技能。<br>答对连击加分，答错看答案记下来！</p>
+  <p>系统会<b>用标准英语朗读</b>单词，你听音拼写、即时判分。<br>右上角可切换难度：<b>小学 / 初中 / 高中</b> 词表任选。<br>答对连击加分，答错看答案记下来！</p>
   <button class="bigbtn" id="btnStart">开 始 听 写</button>
 </div>
 <!-- 结算 -->
@@ -167,6 +170,18 @@ var BANK = {
     {w:"beautifully", cn:"优美地"},{w:"develop", cn:"发展"},{w:"different", cn:"不同的"},{w:"difficult", cn:"困难的"},
     {w:"favorite", cn:"最喜爱的"},{w:"happen", cn:"发生"},{w:"improve", cn:"改善"},{w:"improve", cn:"改善"},
     {w:"library", cn:"图书馆"},{w:"medicine", cn:"药"},{w:"necessary", cn:"必要的"},{w:"patient", cn:"病人"}
+  ],
+  senior: [
+    {w:"accurate", cn:"准确的"},{w:"adapt", cn:"适应"},{w:"admit", cn:"承认"},{w:"advantage", cn:"优势"},
+    {w:"adventure", cn:"冒险"},{w:"ancient", cn:"古代的"},{w:"anxious", cn:"焦虑的"},{w:"apologize", cn:"道歉"},
+    {w:"appreciate", cn:"感激"},{w:"approach", cn:"方法"},{w:"argue", cn:"争论"},{w:"artificial", cn:"人造的"},
+    {w:"atmosphere", cn:"气氛"},{w:"attitude", cn:"态度"},{w:"attract", cn:"吸引"},{w:"audience", cn:"观众"},
+    {w:"available", cn:"可获得的"},{w:"balance", cn:"平衡"},{w:"behave", cn:"表现"},{w:"benefit", cn:"益处"},
+    {w:"brilliant", cn:"出色的"},{w:"campaign", cn:"运动"},{w:"career", cn:"职业"},{w:"challenge", cn:"挑战"},
+    {w:"character", cn:"性格"},{w:"communicate", cn:"交流"},{w:"community", cn:"社区"},{w:"compete", cn:"竞争"},
+    {w:"complain", cn:"抱怨"},{w:"concentrate", cn:"专注"},{w:"confident", cn:"自信的"},{w:"consequence", cn:"后果"},
+    {w:"convenient", cn:"方便的"},{w:"courage", cn:"勇气"},{w:"curious", cn:"好奇的"},{w:"custom", cn:"风俗"},
+    {w:"damage", cn:"损害"},{w:"decade", cn:"十年"},{w:"deserve", cn:"值得"},{w:"determine", cn:"决定"}
   ]
 };
 

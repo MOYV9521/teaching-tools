@@ -622,11 +622,36 @@ paint();
   var AC=window.AudioContext||window.webkitAudioContext;
   var ctx=null,master=null,timer=null,playing=false,step=0,nextT=0;
   var vol=.45,ti=0,on=true;
+  /* 8-bit 游戏配乐库：每首 4 小节(64步)一个循环。
+     prog: [和弦根音相对主音的半音, 大调?1:小调?0]
+     风格可选参数(可省略)：groove four/rock/march · hats back/16/none ·
+     bass fifth/two/oct · wave 主音波形 · lds 主音密度 2=八分 4=四分 ·
+     pat 专属旋律模板 · lv 主音量 · spark:false 关闭小节铃铛 */
   var TRACKS=[
-    {name:"星河漫步", bpm:70, ch:[[60,64,67],[57,60,64],[65,69,72],[53,57,60]], ar:[0,1,2,3,2,1,0,2], hl:true},
-    {name:"海风轻拂", bpm:58, ch:[[57,60,64],[53,57,60],[60,64,67],[55,59,62]], ar:[2,0,1,2,1,0,2,1], hl:false},
-    {name:"晨光钢琴", bpm:74, ch:[[60,64,67],[62,65,69],[65,69,72],[67,71,74]], ar:[0,1,2,1,0,1,2,3], hl:true},
-    {name:"萤火之森", bpm:80, ch:[[64,67,71],[62,65,69],[60,64,67],[65,69,72]], ar:[2,1,0,1,2,1,0,1], hl:true}
+    {name:"糖果小火车", bpm:132, key:60, prog:[[0,1],[5,1],[9,0],[7,1]]},
+    {name:"像素冲刺",   bpm:144, key:62, prog:[[0,1],[9,0],[7,1],[5,1]]},
+    {name:"弹跳果汁机", bpm:126, key:57, prog:[[0,1],[7,1],[5,1],[9,0]]},
+    {name:"小火箭出发", bpm:138, key:64, prog:[[0,1],[7,1],[9,0],[5,1]]},
+    /* —— 8-bit 新风格 —— */
+    {name:"复古街机厅", bpm:152, key:60, groove:"four", hats:"16",
+     prog:[[0,1],[9,0],[5,1],[7,1]],
+     pat:[0,2,1,2, 3,2,1,2, 0,2,1,3, 4,3,2,3]},
+    {name:"号角进行曲", bpm:120, key:62, groove:"march", hats:"none", bass:"two", wave:"triangle", lds:4, lv:.05,
+     prog:[[0,1],[0,1],[5,1],[7,1]],
+     pat:[0,4,2,4, 0,4,2,4, 2,5,4,5, 2,5,4,5]},
+    {name:"星云迪斯科", bpm:112, key:57, groove:"four", hats:"16", bass:"oct", wave:"sine", lv:.05, spark:false,
+     prog:[[0,0],[8,1],[5,0],[7,1]],
+     pat:[0,2,0,2, 0,3,2,3, 0,2,0,2, 1,2,1,3]},
+    {name:"车库摇滚",   bpm:140, key:57, groove:"rock", hats:"back", bass:"two", wave:"square", lv:.035, spark:false,
+     prog:[[0,1],[7,1],[5,1],[0,1]],
+     pat:[0,2,1,0, 1,2,1,0, 0,2,1,3, 2,1,0,2]}
+  ];
+  /* 默认旋律模板兜底 */
+  var _pats=[
+    [0,2,1,2, 0,2,1,3, 0,1,2,1, 0,1,2,3],
+    [0,1,0,2, 0,1,2,3, 1,2,1,0, 1,0,2,1],
+    [0,2,1,0, 2,1,2,3, 0,2,1,2, 1,2,0,2],
+    [0,1,2,1, 0,2,1,2, 0,1,0,2, 1,2,1,3]
   ];
   function save(){ try{ localStorage.setItem("bgmState", JSON.stringify({on:on,ti:ti,vol:Math.round(vol*100)})); }catch(e){} }
   function load(){ try{ var s=localStorage.getItem("bgmState"); if(s){ var o=JSON.parse(s); on=o.on!==false; ti=o.ti||0; vol=(o.vol==null?45:o.vol)/100; } }catch(e){} }
@@ -636,13 +661,63 @@ paint();
     o.type=ty; o.frequency.value=440*Math.pow(2,(midi-69)/12);
     g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(v||.05,t+.02); g.gain.exponentialRampToValueAtTime(0.0001,t+d);
     o.connect(g); g.connect(master); o.start(t); o.stop(t+d+.05); }
-  function spb(){ return 60/TRACKS[ti].bpm/2; }
-  function sched(s,t){ var tr=TRACKS[ti], bar=Math.floor(s/8), chord=tr.ch[bar%tr.ch.length], seq=s%8, a=tr.ar[seq];
-    if(seq===0) note(chord[0]-12,t,1.1,"sine",.085);
-    note(chord[a],t,.5,"triangle",.05);
-    if(tr.hl && (seq===2||seq===6)) note(chord[2]+12,t,.6,"sine",.022);
+  /* 节奏单位：16 分音符；每 4 小节(64步)一个循环 */
+  function spb(){ return 60/TRACKS[ti].bpm/4; }
+  var _noiseBuf=null;
+  function noise(t,vol,dur,hp){
+    if(!ctx)return;
+    if(!_noiseBuf){ var L=ctx.sampleRate*0.05; _noiseBuf=ctx.createBuffer(1,L,ctx.sampleRate); var d=_noiseBuf.getChannelData(0); for(var i=0;i<L;i++) d[i]=Math.random()*2-1; }
+    var src=ctx.createBufferSource(); src.buffer=_noiseBuf;
+    var g=ctx.createGain(); g.gain.setValueAtTime(vol||.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+(dur||.04));
+    var f=ctx.createBiquadFilter(); f.type="highpass"; f.frequency.value=hp||6000;
+    src.connect(f); f.connect(g); g.connect(master); src.start(t); src.stop(t+dur+.05);
   }
-  function tick(){ if(!ctx) return; while(nextT < ctx.currentTime + .3){ sched(step,nextT); nextT+=spb(); step=(step+1)%1024; } }
+  function kick(t){
+    if(!ctx)return;
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(46,t+.12);
+    g.gain.setValueAtTime(.14,t); g.gain.exponentialRampToValueAtTime(.0001,t+.14);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+.18);
+  }
+  function snare(t){
+    if(!ctx)return;
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.type="triangle"; o.frequency.setValueAtTime(190,t); o.frequency.exponentialRampToValueAtTime(120,t+.07);
+    g.gain.setValueAtTime(.09,t); g.gain.exponentialRampToValueAtTime(.0001,t+.08);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+.12);
+    noise(t,.08,.05,1600);
+  }
+  function sched(s,t){
+    var tr=TRACKS[ti], bar=Math.floor(s/16)%tr.prog.length, rel=tr.prog[bar];
+    var root=tr.key+rel[0], isMin=!rel[1], st=s%16;
+    var up=isMin?3:4;
+    var ch=[root, root+up, root+7, root+12, root+12+up]; /* 和弦分解音：根/三/五/高根/高三 */
+    var groove=tr.groove||"four", hats=tr.hats||"back", bass=tr.bass||"fifth";
+    /* 主旋律：和弦内音 riff（默认 8 分音符 square；lds=4 时是铿锵四分音符） */
+    var lds=tr.lds||2;
+    if(st%lds===0){
+      var px=st/lds;
+      var arr=(tr.pat||_pats[ti%_pats.length]);
+      if(px<arr.length){ var pi=arr[px]; note(ch[pi%ch.length],t,lds===4?.32:.19,tr.wave||"square",tr.lv||(lds===4?.05:.03)); }
+    }
+    /* 贝斯 */
+    if(st%4===0) note(root-24,t,.12,tr.bwave||"triangle",.11);
+    else if(st%4===2){
+      if(bass==="oct") note(root-12,t,.1,"triangle",.08);
+      else if(bass==="two") note(root-24,t,.1,"triangle",.09);
+      else note(root-17,t,.12,"triangle",.08);
+    }
+    /* 鼓组：four 四拍舞曲 / rock 车库摇滚 / march 行进曲 */
+    if(groove==="rock"){ if(st===0||st===10) kick(t); if(st===4||st===12) snare(t); }
+    else if(groove==="march"){ if(st===0) kick(t); if(st===4||st===8||st===12) snare(t); }
+    else { if(st%4===0) kick(t); if(st===4||st===12) snare(t); }
+    /* 踩镲：16 十六分连镲 / back 反拍 / none 无 */
+    if(hats==="16"){ if(st%2===0) noise(t,.02,.025,8500); }
+    else if(hats==="back" && st%4===2) noise(t,.02,.03,8500);
+    /* 小节头铃铛点缀（可关） */
+    if(st===0 && tr.spark!==false){ note(root+12,t,.3,"sine",.05); noise(t,.012,.05,10000); }
+  }
+  function tick(){ if(!ctx) return; while(nextT < ctx.currentTime + .35){ sched(step,nextT); nextT+=spb(); step=(step+1)%64; } }
   function start(){ if(!ac()) return; if(!timer) timer=setInterval(tick,90); step=0; nextT=ctx.currentTime+.06; playing=true; ui(); }
   function stop(){ if(timer){ clearInterval(timer); timer=null; } playing=false; ui(); }
   var bToggle=$("bgmToggle"), bNext=$("bgmNext"), bName=$("bgmName"), bVol=$("bgmVol");
