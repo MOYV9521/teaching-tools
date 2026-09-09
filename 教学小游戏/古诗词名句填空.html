@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古诗词名句填空</title>
+<style>
+  *{ margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei","PingFang SC","Kaiti SC",serif; }
+  body{ background:#f7f1e3 url(); min-height:100vh; color:#3a3325;
+    background-image:radial-gradient(#d9cbaa 1px,transparent 1px); background-size:22px 22px;
+    display:flex; flex-direction:column; align-items:center; padding:24px 14px; }
+  .back{ position:fixed; top:16px; left:16px; background:rgba(120,80,40,.08); color:#7a5c33; border:1px solid rgba(120,80,40,.25);
+    padding:8px 14px; border-radius:10px; font-size:13px; text-decoration:none; z-index:20; font-family:"Microsoft YaHei",sans-serif; }
+  .back:hover{ background:rgba(120,80,40,.18); }
+  h1{ font-family:"Kaiti SC","STKaiti",serif; letter-spacing:4px; font-size:30px; text-align:center; }
+  h1 b{ color:#a6362c; font-weight:900; }
+  .sub{ color:#8a7a5f; font-size:13px; margin-top:4px; text-align:center; letter-spacing:1px; }
+  .wrap{ width:100%; max-width:600px; }
+  .card{ background:rgba(255,253,246,.94); border:1px solid #e4d8ba; border-radius:18px; box-shadow:0 12px 30px rgba(90,66,30,.12);
+    padding:26px; margin-top:22px; position:relative; }
+  .card::before{ content:""; position:absolute; inset:8px; border:1px solid #f0e6cd; border-radius:13px; pointer-events:none; }
+  .hud{ display:flex; justify-content:space-between; font-size:13px; color:#94866c; margin-bottom:8px; }
+  .hud b{ color:#a6362c; font-size:16px; }
+  .tag{ display:inline-block; font-size:12px; padding:3px 12px; border-radius:99px; background:#a6362c; color:#fdf6e3; font-weight:700; }
+  .poem{ text-align:center; margin:26px 0 10px; }
+  .poem .line{ font-family:"Kaiti SC","STKaiti",serif; font-size:clamp(24px,6vw,34px); font-weight:700; letter-spacing:3px; line-height:1.8; }
+  .poem .blank{ color:#a6362c; text-decoration:underline dotted; text-underline-offset:6px; }
+  .poem .qmark{ font-size:12px; color:#a3906b; margin-top:6px; }
+  .opts{ display:grid; gap:10px; margin-top:18px; }
+  .op{ padding:14px 16px; border-radius:12px; border:1.5px solid #e0d3b4; background:#fdfaf0; text-align:center;
+    font-family:"Kaiti SC","STKaiti",serif; font-size:18px; font-weight:700; color:#4c4231; cursor:pointer; transition:.15s; }
+  .op:hover{ border-color:#c9a86a; background:#fbf3dc; }
+  .op.right{ background:#3f7d4e; border-color:#3f7d4e; color:#fff; }
+  .op.wrong{ background:#c0523f; border-color:#c0523f; color:#fff; animation:shake .4s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-8px)}50%{transform:translateX(8px)} }
+  .src{ margin-top:16px; text-align:center; font-size:14px; color:#8a7a5f; min-height:24px; }
+  .src b{ color:#a6362c; }
+  .bar{ height:8px; background:#eee3c9; border-radius:99px; margin:10px 0 0; overflow:hidden; }
+  .bar i{ display:block; height:100%; width:0%; background:linear-gradient(90deg,#d9a441,#a6362c); transition:.3s; border-radius:99px; }
+  .hidden{ display:none; }
+  .res .big{ font-size:54px; text-align:center; }
+  .res h2{ text-align:center; margin-top:4px; font-size:24px; }
+  .rrow{ display:flex; justify-content:space-between; padding:9px 2px; border-bottom:1px dashed #e2d6ba; }
+  .rrow b{ color:#a6362c; }
+  .rev{ margin-top:14px; max-height:190px; overflow:auto; font-size:13px; color:#7a6a4f; line-height:1.9; }
+  .btns{ display:flex; gap:10px; margin-top:18px; }
+  .btns button{ flex:1; padding:13px; border:none; border-radius:12px; font-weight:800; font-size:15px; cursor:pointer; font-family:"Microsoft YaHei",sans-serif; }
+  .b1{ background:linear-gradient(120deg,#c0392b,#a6362c); color:#fdf3e2; box-shadow:0 6px 16px rgba(166,54,44,.3); }
+  .b2{ background:#efe6cf; color:#6d5b3c; border:1px solid #ddd0ac; }
+</style>
+</head>
+<body>
+<a class="back" href="../index.html#library" target="_top">‹ 返回展厅</a>
+<h1>古诗词<b>名句填空</b></h1>
+<div class="sub">补全诗句 · 争做诗词小达人</div>
+
+<div class="wrap">
+  <div class="card" id="gameCard">
+    <div class="hud"><span>得分 <b id="score">0</b></span><span>第 <b id="idx">1</b> / <b id="total">10</b> 题</span><span id="streakBox">连对 ×0</span></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="poem">
+      <span class="tag" id="tag">补下句</span>
+      <div class="line" id="line">—</div>
+      <div class="qmark" id="hint"></div>
+    </div>
+    <div class="opts" id="opts"></div>
+    <div class="src" id="src"></div>
+  </div>
+
+  <div class="card res hidden" id="resCard">
+    <div class="big" id="emoji">🏮</div>
+    <h2 id="rtitle">挑战完成</h2>
+    <div class="rrow"><span>得分</span><b id="rscore">0</b></div>
+    <div class="rrow"><span>答对</span><b id="racc">0 / 10</b></div>
+    <div class="rrow"><span>正确率</span><b id="rrate">0%</b></div>
+    <div id="revBox"><div class="sub" style="text-align:left;font-weight:800;">📖 错题回放</div><div class="rev" id="rev"></div></div>
+    <div class="btns"><button class="b1" id="again">再来一轮</button><button class="b2" id="more">换题目</button></div>
+  </div>
+</div>
+
+<script>
+const P=[
+ {u:"白日依山尽",d:"黄河入海流",t:"登鹳雀楼",a:"王之涣",y:"唐"},
+ {u:"欲穷千里目",d:"更上一层楼",t:"登鹳雀楼",a:"王之涣",y:"唐"},
+ {u:"床前明月光",d:"疑是地上霜",t:"静夜思",a:"李白",y:"唐"},
+ {u:"举头望明月",d:"低头思故乡",t:"静夜思",a:"李白",y:"唐"},
+ {u:"春眠不觉晓",d:"处处闻啼鸟",t:"春晓",a:"孟浩然",y:"唐"},
+ {u:"锄禾日当午",d:"汗滴禾下土",t:"悯农",a:"李绅",y:"唐"},
+ {u:"野火烧不尽",d:"春风吹又生",t:"赋得古原草送别",a:"白居易",y:"唐"},
+ {u:"会当凌绝顶",d:"一览众山小",t:"望岳",a:"杜甫",y:"唐"},
+ {u:"随风潜入夜",d:"润物细无声",t:"春夜喜雨",a:"杜甫",y:"唐"},
+ {u:"海内存知己",d:"天涯若比邻",t:"送杜少府之任蜀州",a:"王勃",y:"唐"},
+ {u:"不畏浮云遮望眼",d:"自缘身在最高层",t:"登飞来峰",a:"王安石",y:"宋"},
+ {u:"落红不是无情物",d:"化作春泥更护花",t:"己亥杂诗",a:"龚自珍",y:"清"},
+ {u:"竹外桃花三两枝",d:"春江水暖鸭先知",t:"惠崇春江晚景",a:"苏轼",y:"宋"},
+ {u:"不识庐山真面目",d:"只缘身在此山中",t:"题西林壁",a:"苏轼",y:"宋"},
+ {u:"问渠那得清如许",d:"为有源头活水来",t:"观书有感",a:"朱熹",y:"宋"},
+ {u:"明月几时有",d:"把酒问青天",t:"水调歌头",a:"苏轼",y:"宋"},
+ {u:"国破山河在",d:"城春草木深",t:"春望",a:"杜甫",y:"唐"},
+ {u:"人生自古谁无死",d:"留取丹心照汗青",t:"过零丁洋",a:"文天祥",y:"宋"},
+ {u:"朝辞白帝彩云间",d:"千里江陵一日还",t:"早发白帝城",a:"李白",y:"唐"},
+ {u:"两个黄鹂鸣翠柳",d:"一行白鹭上青天",t:"绝句",a:"杜甫",y:"唐"},
+ {u:"接天莲叶无穷碧",d:"映日荷花别样红",t:"晓出净慈寺送林子方",a:"杨万里",y:"宋"},
+ {u:"慈母手中线",d:"游子身上衣",t:"游子吟",a:"孟郊",y:"唐"},
+ {u:"红豆生南国",d:"春来发几枝",t:"相思",a:"王维",y:"唐"},
+ {u:"千山鸟飞绝",d:"万径人踪灭",t:"江雪",a:"柳宗元",y:"唐"},
+ {u:"飞流直下三千尺",d:"疑是银河落九天",t:"望庐山瀑布",a:"李白",y:"唐"},
+ {u:"不知细叶谁裁出",d:"二月春风似剪刀",t:"咏柳",a:"贺知章",y:"唐"},
+ {u:"春风又绿江南岸",d:"明月何时照我还",t:"泊船瓜洲",a:"王安石",y:"宋"},
+ {u:"独在异乡为异客",d:"每逢佳节倍思亲",t:"九月九日忆山东兄弟",a:"王维",y:"唐"}
+];
+const POOL=[...P.map(p=>p.u),...P.map(p=>p.d)];
+const $=s=>document.querySelector(s);
+let qs=[],i=0,score=0,right=0,streak=0,mist=[],lock=false;
+
+function pick(rounds){
+  const arr=P.slice().sort(()=>Math.random()-.5).slice(0,rounds);
+  return arr.map(p=>({...p,way:Math.random()<.5?"d":"u"}));
+}
+function start(){
+  qs=pick(10); i=0;score=0;right=0;streak=0;mist=[];
+  $("#resCard").classList.add("hidden"); $("#gameCard").classList.remove("hidden"); render();
+}
+function render(){
+  const p=qs[i];
+  $("#score").textContent=score; $("#idx").textContent=i+1; $("#total").textContent=qs.length;
+  $("#streakBox").textContent="连对 ×"+streak; $("#bar").style.width=(i/qs.length*100)+"%";
+  const ask = p.way==="d" ? p.u : p.d;          // 给这一句
+  const ans = p.way==="d" ? p.d : p.u;
+  $("#tag").textContent= p.way==="d" ? "请补下句" : "请补上句";
+  $("#line").innerHTML= p.way==="d" ? ask+"，<span class='blank'>______</span>" : "<span class='blank'>______</span>，"+ask;
+  $("#hint").textContent= p.way==="d" ? "从选项中选出最恰当的下句" : "从选项中选出最恰当的上句";
+  $("#src").textContent="";
+  // 干扰项：其它诗行
+  const dis=POOL.filter(x=>x!==ans).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[ans,...dis].sort(()=>Math.random()-.5);
+  lock=false;
+  $("#opts").innerHTML=opts.map(o=>`<button class="op">${o}</button>`).join("");
+  document.querySelectorAll("#opts .op").forEach(b=>b.onclick=()=>answer(b,ans,p));
+}
+function answer(btn,ans,p){
+  if(lock)return; lock=true;
+  const v=btn.textContent;
+  if(v===ans){ btn.classList.add("right"); score+=10; right++; streak++;
+  }else{ btn.classList.add("wrong"); streak=0; mist.push("《"+p.t+"》"+p.u+"，"+p.d); 
+    [...document.querySelectorAll("#opts .op")].forEach(b=>{ if(b.textContent===ans) b.classList.add("right"); }); }
+  $("#src").innerHTML="——《"+p.t+"》<b>"+p.a+"</b>（"+p.y+"）";
+  setTimeout(()=>{ i++; i<qs.length? render() : finish(); },1500);
+}
+function finish(){
+  $("#gameCard").classList.add("hidden"); $("#resCard").classList.remove("hidden");
+  const rate=Math.round(right/qs.length*100);
+  const em= rate>=90?"🏮":rate>=70?"📜":rate>=50?"🖌️":"📖";
+  const t= rate>=90?"诗词小状元！":rate>=70?"腹有诗书气自华":rate>=50?"继续积累吧":"熟读唐诗三百首，不会作诗也会吟";
+  $("#emoji").textContent=em; $("#rtitle").textContent=t;
+  $("#rscore").textContent=score; $("#racc").textContent=right+" / "+qs.length; $("#rrate").textContent=rate+"%";
+  $("#rev").innerHTML=mist.length? mist.map(m=>"• "+m).join("<br>") : "";
+  $("#revBox").style.display=mist.length?"":"none";
+}
+$("#again").onclick=start;
+$("#more").onclick=start;
+start();
+</script>
+<script src="sfx.js"></script>
+</body>
+</html>

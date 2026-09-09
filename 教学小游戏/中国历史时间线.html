@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国历史时间线 · 排序闯关</title>
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft YaHei","PingFang SC","Songti SC",serif; }
+  body{ background:linear-gradient(160deg,#191510,#2c2218 60%,#1c1512); color:#f2e7cf; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; padding:24px 14px 40px; }
+  .back{ position:fixed; top:16px; left:16px; background:rgba(255,255,255,.07); color:#d8c49a; border:1px solid rgba(255,255,255,.18);
+    padding:8px 14px; border-radius:10px; font-size:13px; text-decoration:none; z-index:20; font-family:"Microsoft YaHei",sans-serif;}
+  .back:hover{ background:rgba(255,255,255,.15); color:#fff; }
+  h1{ font-size:26px; text-align:center; letter-spacing:2px; }
+  h1 em{ font-style:normal; color:#e8b258; }
+  .sub{ text-align:center; color:#b6a27c; font-size:13px; margin-top:6px; }
+  .top{ display:flex; gap:14px; justify-content:center; margin-top:16px; flex-wrap:wrap; font-size:13px; color:#cdbb95; }
+  .top b{ color:#e8b258; }
+  .levels{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+  .lv{ padding:9px 18px; border-radius:999px; border:1px solid rgba(232,178,88,.4); background:rgba(232,178,88,.08); color:#e2c98f;
+    font-size:13px; cursor:pointer; font-weight:700; transition:.2s; }
+  .lv:hover{ background:rgba(232,178,88,.2); }
+  .lv.on{ background:linear-gradient(135deg,#e8b258,#c77f2a); color:#241a0d; border-color:transparent; }
+  .lv.done{ background:rgba(80,180,120,.18); border-color:rgba(80,180,120,.5); color:#9ce0b6; }
+  .arena{ width:100%; max-width:760px; margin-top:18px; }
+  .card{ background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:20px; }
+  .step{ font-size:13px; color:#a8935f; letter-spacing:2px; }
+  .prompt{ font-size:17px; margin:6px 0 16px; font-weight:700; }
+  .result{ display:flex; flex-wrap:wrap; gap:8px; min-height:44px; padding:10px; border:1px dashed rgba(232,178,88,.4);
+    border-radius:12px; margin-bottom:16px; }
+  .res-chip{ padding:8px 16px; border-radius:9px; background:linear-gradient(135deg,#e8b258,#c77f2a); color:#241a0d;
+    font-weight:800; font-size:14px; animation:pop .25s; }
+  @keyframes pop{ from{transform:scale(.7)} }
+  .pool{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .opt{ padding:12px 20px; border-radius:12px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06);
+    color:#efe3c4; font-size:15px; font-weight:700; cursor:pointer; transition:.15s; }
+  .opt:hover{ background:rgba(255,255,255,.14); transform:translateY(-2px); }
+  .opt.err{ background:rgba(220,70,70,.25); border-color:#e06a6a; animation:shake .4s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-7px)}50%{transform:translateX(7px)} }
+  .tip{ min-height:22px; margin-top:14px; text-align:center; font-size:14px; color:#9ce0b6; font-weight:600; }
+  .know{ margin-top:12px; padding:12px 14px; border-radius:12px; background:rgba(232,178,88,.08); border:1px solid rgba(232,178,88,.25);
+    font-size:13px; color:#d9c9a2; line-height:1.7; }
+  .mask{ position:fixed; inset:0; background:rgba(10,8,5,.92); display:none; align-items:center; justify-content:center; z-index:60; padding:20px; }
+  .mask.on{ display:flex; }
+  .box{ max-width:440px; width:100%; text-align:center; background:#241b10; border:1px solid rgba(232,178,88,.4); padding:34px; border-radius:22px; }
+  .box h2{ font-size:26px; color:#e8b258; margin:10px 0 6px; }
+  .btn{ margin-top:16px; padding:12px 30px; border:none; border-radius:12px; font-weight:800; font-size:15px; cursor:pointer;
+    background:linear-gradient(120deg,#e8b258,#c77f2a); color:#241a0d; }
+  .btn2{ background:rgba(255,255,255,.1); color:#d8c49a; border:1px solid rgba(255,255,255,.2); }
+</style>
+</head>
+<body>
+<a class="back" href="../index.html#library" target="_top">‹ 返回展厅</a>
+<h1>华夏<em>时间线</em> · 排序闯关</h1>
+<div class="sub">按时间先后，依次点击正确的下一个朝代 / 事件</div>
+
+<div class="top"><span>当前进度 <b id="prog">0 / 8</b></span><span>失误 <b id="errs">0</b> 次</span></div>
+<div class="levels" id="levels"></div>
+
+<div class="arena">
+  <div class="card">
+    <div class="step" id="step">第 1 关 · 古代王朝（上）</div>
+    <div class="prompt" id="prompt">🧭 时间从古到今，请点击「下一个」应出现的历史节点：</div>
+    <div class="result" id="result"></div>
+    <div class="pool" id="pool"></div>
+    <div class="tip" id="tip"></div>
+    <div class="know hidden" id="know"></div>
+  </div>
+</div>
+
+<div class="mask" id="mask"><div class="box">
+  <h2 id="bT">🎊 通关！</h2>
+  <p id="bP" style="color:#cdbb95;line-height:1.9;"></p>
+  <button class="btn" id="nextLv">下一关</button>
+  <button class="btn btn2" id="again">重玩本关</button>
+</div></div>
+
+<script>
+const STAGES=[
+ { t:"古代王朝 · 上", items:["夏","商","西周","秦","西汉","东汉","三国","西晋"],
+   info:"夏朝是中国第一个世袭王朝；商朝有了甲骨文；西周确立分封制；秦完成大一统；汉朝国力强盛；三国鼎立后，司马氏建立西晋。" },
+ { t:"古代王朝 · 下", items:["东晋","南北朝","隋","唐","五代十国","北宋","南宋","元","明","清"],
+   info:"隋唐开创科举与盛世；五代十国后北宋统一中原；南宋偏安江南；元朝疆域空前；明清时期封建专制发展到顶峰。" },
+ { t:"近代大事 · 上", items:["鸦片战争","太平天国运动","甲午中日战争","戊戌变法","辛亥革命"],
+   info:"鸦片战争使中国开始沦为半殖民地半封建社会；此后各阶层掀起救亡运动：太平天国、戊戌变法、辛亥革命相继登场。" },
+ { t:"近代大事 · 下", items:["五四运动","中国共产党成立","南昌起义","抗日战争胜利","新中国成立"],
+   info:"五四运动是旧民主主义革命到新民主主义革命的转折点；1921 年中国共产党成立；1949 年新中国成立，历史翻开新篇章。" }
+];
+const $=s=>document.querySelector(s);
+let stage=0, need=0, okCount=0, errCount=0, unlocked=[true];
+
+function renderLv(){
+  $("#levels").innerHTML=STAGES.map((s,i)=>`<button class="lv ${i===stage?"on":""} ${unlocked[i]&&i>0?"done":""}">${i+1}. ${s.t}</button>`).join("");
+  document.querySelectorAll(".lv").forEach((b,i)=>b.onclick=()=>{ if(unlocked[i]){stage=i; load();}});
+}
+function load(){
+  const s=STAGES[stage];
+  okCount=0; errCount=0; need=0; $("#errs").textContent="0";
+  $("#prog").textContent="0 / "+s.items.length;
+  $("#step").textContent="第 "+(stage+1)+" 关 · "+s.t;
+  $("#know").classList.add("hidden"); $("#tip").textContent="";
+  $("#result").innerHTML="";
+  const pool=s.items.slice().sort(()=>Math.random()-.5);
+  $("#pool").innerHTML=pool.map(it=>`<button class="opt" data-it="${it}">${it}</button>`).join("");
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(b));
+  renderLv();
+}
+function choose(btn){
+  const s=STAGES[stage]; const it=btn.dataset.it;
+  const target=s.items[okCount];
+  if(it===target){
+    btn.remove();
+    $("#result").insertAdjacentHTML("beforeend",`<span class="res-chip">${it}</span>`);
+    okCount++; need=0; $("#prog").textContent=okCount+" / "+s.items.length;
+    $("#tip").textContent="";
+    if(okCount===s.items.length){ showKnow(); }
+  }else{
+    errCount++; need++;
+    $("#errs").textContent=errCount;
+    btn.classList.add("err"); setTimeout(()=>btn.classList.remove("err"),450);
+    const a=s.items.indexOf(target), b=s.items.indexOf(it);
+    const hint = (b < a) ? "太早了 —— 它应该出现在更早的位置 ✔" : "还没到它 —— 请先点出更早的那个 ✔";
+    $("#tip").textContent=hint;
+  }
+}
+function showKnow(){
+  $("#know").textContent="📜 小知识："+STAGES[stage].info;
+  $("#know").classList.remove("hidden");
+  if(stage<STAGES.length-1){
+    $("#mask").classList.add("on");
+    $("#bT").textContent=(errCount===0?"🎖️ 零失误通关！":"✅ 通关！");
+    $("#bP").innerHTML="本关失误 <b style='color:#e8b258'>"+errCount+"</b> 次<br>解锁下一关吧！";
+    $("#nextLv").style.display="";
+  }else{
+    $("#mask").classList.add("on");
+    $("#bT").textContent="🏆 全部关卡完成！";
+    $("#bP").innerHTML="累计失误 <b style='color:#e8b258'>"+errCount+"</b> 次<br>你就是历史时间线小达人！";
+    $("#nextLv").style.display="none";
+  }
+  $("#nextLv").onclick=()=>{ unlocked[stage+1]=true; stage++; $("#mask").classList.remove("on"); load(); };
+  $("#again").onclick=()=>{ $("#mask").classList.remove("on"); load(); };
+}
+renderLv(); load();
+</script>
+<script src="sfx.js"></script>
+</body>
+</html>

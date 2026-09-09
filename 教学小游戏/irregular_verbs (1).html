@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初中不规则动词背诵</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .progress {
+            transition: width 0.3s ease;
+        }
+
+        .answer {
+            display: inline;
+        }
+
+        .hidden-answer {
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold text-center mb-8">初中不规则动词背诵</h1>
+        <div id="level-select" class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-bold mb-4">选择关卡</h2>
+            <select id="level" class="border border-gray-300 p-2 rounded-md w-full mb-4">
+                <option value="all">全部单词</option>
+                <option value="AAA">AAA型（动词原形、过去式和过去分词同形）</option>
+                <option value="AAB">AAB型（动词原形和过去式同形）</option>
+                <option value="ABB">ABB型（过去式和过去分词同形）</option>
+                <option value="ABC">ABC型（动词原形、过去式和过去分词都不同）</option>
+            </select>
+            <button id="start"
+                class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">开始背诵</button>
+        </div>
+        <div id="quiz" class="bg-white p-6 rounded-lg shadow-md hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div class="progress bg-blue-500 h-4 rounded-md" style="width: 0%;"></div>
+                <span class="text-sm text-gray-600" id="progress-text">0% 完成</span>
+            </div>
+            <div id="question" class="text-2xl font-bold mb-4">点击开始背诵</div>
+            <select id="question-select" class="border border-gray-300 p-2 rounded-md w-full mb-4 hidden">
+            </select>
+            <input type="text" id="answer" class="border border-gray-300 p-2 rounded-md w-full mb-4"
+                placeholder="输入过去式和过去分词，用空格分隔">
+            <button id="check"
+                class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">检查</button>
+            <button id="next"
+                class="bg-green-500 text-white p-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 ml-2">下一个</button>
+            <button id="settle-score"
+                class="bg-orange-500 text-white p-2 rounded-md hover:bg-orange-600 focus:outline-none focus:ring focus:ring-orange-300 ml-2" disabled>结算成绩</button>
+            <button id="back-to-main"
+                class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300 ml-2">返回主界面</button>
+            <div id="result" class="mt-4"></div>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+            <h2 class="text-xl font-bold mb-4">历史记录</h2>
+            <ul id="history"></ul>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+            <h2 class="text-xl font-bold mb-4">错题记录</h2>
+            <ul id="wrong-answers"></ul>
+        </div>
+        <button id="open-word-list"
+            class="bg-yellow-500 text-white p-2 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring focus:ring-yellow-300 mt-8">打开单词表</button>
+    </div>
+
+    <div id="word-list-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-bold mb-4">单词表</h2>
+            <button id="toggle-answers-modal"
+                class="bg-yellow-500 text-white p-2 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring focus:ring-yellow-300 mb-4">隐藏答案</button>
+            <ul id="word-list-modal-ul"></ul>
+        </div>
+    </div>
+
+    <div id="score-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-xl font-bold mb-4">成绩结算</h2>
+            <p id="score-text"></p>
+            <h3 class="text-lg font-bold mb-2">错题记录</h3>
+            <ul id="score-wrong-answers"></ul>
+        </div>
+    </div>
+
+    <script>
+        const allIrregularVerbs = [
+            // AAA型（动词原形、过去式和过去分词同形）
+            ["cost", "cost", "cost", "花费；使付出"],
+            ["cut", "cut", "cut", "切割；削减"],
+            ["hit", "hit", "hit", "打击；碰撞"],
+            ["hurt", "hurt", "hurt", "伤害；使受伤"],
+            ["let", "let", "let", "让；允许"],
+            ["put", "put", "put", "放置；安置"],
+            ["read", "read", "read", "阅读；朗读"],
+            ["set", "set", "set", "设置；放置"],
+            ["shut", "shut", "shut", "关闭；闭上"],
+            // AAB型（动词原形和过去式同形）
+            ["beat", "beat", "beaten", "打败；敲打"],
+            // ABB型（过去式和过去分词同形）
+            ["bring", "brought", "brought", "带来；拿来"],
+            ["buy", "bought", "bought", "购买；买"],
+            ["catch", "caught", "caught", "抓住；赶上"],
+            ["build", "built", "built", "建造；建筑"],
+            ["lend", "lent", "lent", "借给；借出"],
+            ["send", "sent", "sent", "发送；寄"],
+            ["spend", "spent", "spent", "花费；度过"],
+            ["sit", "sat", "sat", "坐；就座"],
+            ["dig", "dug", "dug", "挖；掘"],
+            ["get", "got", "got", "得到；获得"],
+            ["hang", "hung", "hung", "悬挂；吊"],
+            ["hold", "held", "held", "握住；持有"],
+            ["keep", "kept", "kept", "保持；保留"],
+            ["leave", "left", "left", "离开；留下"],
+            ["make", "made", "made", "制作；制造"],
+            ["mean", "meant", "meant", "意思是；意味着"],
+            ["meet", "met", "met", "遇见；相遇"],
+            ["pay", "paid", "paid", "支付；付款"],
+            ["say", "said", "said", "说；讲"],
+            ["sell", "sold", "sold", "卖；出售"],
+            ["shoot", "shot", "shot", "射击；发射"],
+            ["sit", "sat", "sat", "坐；就座"],
+            ["sleep", "slept", "slept", "睡觉；入睡"],
+            ["smell", "smelt", "smelt", "闻；嗅；有……气味"],
+            ["spend", "spent", "spent", "花费；度过"],
+            ["stand", "stood", "stood", "站立；忍受"],
+            ["teach", "taught", "taught", "教；讲授"],
+            ["tell", "told", "told", "告诉；讲述"],
+            ["think", "thought", "thought", "想；思考；认为"],
+            ["win", "won", "won", "赢；获胜"],
+            // ABC型（动词原形、过去式和过去分词都不同）
+            ["begin", "began", "begun", "开始；着手"],
+            ["drink", "drank", "drunk", "喝；饮用"],
+            ["ring", "rang", "rung", "打电话；响铃"],
+            ["sing", "sang", "sung", "唱；唱歌"],
+            ["swim", "swam", "swum", "游泳；游"],
+            ["blow", "blew", "blown", "吹；刮"],
+            ["draw", "drew", "drawn", "画；绘制"],
+            ["fly", "flew", "flown", "飞；飞行"],
+            ["grow", "grew", "grown", "生长；成长"],
+            ["know", "knew", "known", "知道；了解"],
+            ["throw", "threw", "thrown", "扔；投掷"],
+            ["break", "broke", "broken", "打破；损坏"],
+            ["choose", "chose", "chosen", "选择；挑选"],
+            ["forget", "forgot", "forgotten", "忘记；遗忘"],
+            ["freeze", "froze", "frozen", "冻结；结冰"],
+            ["speak", "spoke", "spoken", "说；讲；谈话"],
+            ["wake", "woke", "woken", "醒来；唤醒"],
+            ["drive", "drove", "driven", "驾驶；开车"],
+            ["ride", "rode", "ridden", "骑；乘"],
+            ["write", "wrote", "written", "写；书写"],
+            ["eat", "ate", "eaten", "吃"],
+            ["fall", "fell", "fallen", "落下；跌倒"],
+            ["give", "gave", "given", "给；给予"],
+            ["take", "took", "taken", "拿；取；带走"],
+            ["see", "saw", "seen", "看见；看到"],
+            ["go", "went", "gone", "去；走"],
+            ["do", "did", "done", "做；干"],
+            ["be", "was/were", "been", "是（am/is/are的过去式）"]
+        ];
+
+        let currentLevel = "all";
+        let currentVerbs = allIrregularVerbs;
+        let currentIndex = 0;
+        let correctCount = 0;
+        const history = [];
+        const wrongAnswers = [];
+
+        function filterVerbs(level) {
+            switch (level) {
+                case "AAA":
+                    return allIrregularVerbs.filter(verb => verb[0] === verb[1] && verb[1] === verb[2]);
+                case "AAB":
+                    return allIrregularVerbs.filter(verb => verb[0] === verb[1] && verb[1]!== verb[2]);
+                case "ABB":
+                    return allIrregularVerbs.filter(verb => verb[1] === verb[2] && verb[0]!== verb[1]);
+                case "ABC":
+                    return allIrregularVerbs.filter(verb => verb[0]!== verb[1] && verb[1]!== verb[2] && verb[0]!== verb[2]);
+                default:
+                    return allIrregularVerbs;
+            }
+        }
+
+        function showQuestion() {
+            const verb = currentVerbs[currentIndex][0];
+            const chineseMeaning = currentVerbs[currentIndex][3];
+            document.getElementById("question").textContent = `请写出 "${verb}"（${chineseMeaning}）的过去式和过去分词（用空格分隔）`;
+            const questionSelect = document.getElementById('question-select');
+            questionSelect.selectedIndex = currentIndex;
+        }
+
+        function populateQuestionSelect() {
+            const questionSelect = document.getElementById('question-select');
+            questionSelect.innerHTML = '';
+            currentVerbs.forEach((verb, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${verb[0]}（${verb[3]}）`;
+                questionSelect.appendChild(option);
+            });
+            questionSelect.addEventListener('change', function () {
+                currentIndex = parseInt(this.value);
+                showQuestion();
+                document.getElementById('answer').value = '';
+                document.getElementById('result').textContent = '';
+            });
+        }
+
+        function checkAnswer() {
+            const answer = document.getElementById("answer").value.trim().split(" ");
+            const correctPast = currentVerbs[currentIndex][1];
+            const correctPastParticiple = currentVerbs[currentIndex][2];
+            const isCorrect = answer[0] === correctPast && answer[1] === correctPastParticiple;
+
+            const resultElement = document.getElementById("result");
+            if (isCorrect) {
+                resultElement.textContent = "回答正确！";
+                resultElement.classList.remove("text-red-500");
+                resultElement.classList.add("text-green-500");
+                correctCount++;
+            } else {
+                resultElement.textContent = `回答错误，正确答案是 "${correctPast} ${correctPastParticiple}"`;
+                resultElement.classList.remove("text-green-500");
+                resultElement.classList.add("text-red-500");
+                wrongAnswers.push({
+                    verb: currentVerbs[currentIndex][0],
+                    correctAnswer: `${correctPast} ${correctPastParticiple}`
+                });
+                updateWrongAnswers();
+            }
+
+            history.push({
+                verb: currentVerbs[currentIndex][0],
+                answer: answer.join(" "),
+                correct: isCorrect
+            });
+            updateHistory();
+            updateProgress();
+        }
+
+        function updateHistory() {
+            const historyElement = document.getElementById("history");
+            historyElement.innerHTML = "";
+            history.forEach((item) => {
+                const li = document.createElement("li");
+                li.textContent = `${item.verb}: 你的答案 "${item.answer}"，${item.correct ? "正确" : "错误"}`;
+                historyElement.appendChild(li);
+            });
+        }
+
+        function updateWrongAnswers() {
+            const wrongAnswersElement = document.getElementById("wrong-answers");
+            wrongAnswersElement.innerHTML = "";
+            wrongAnswers.forEach((item) => {
+                const li = document.createElement("li");
+                li.textContent = `${item.verb}: 正确答案 "${item.correctAnswer}"`;
+                wrongAnswersElement.appendChild(li);
+            });
+        }
+
+        function updateProgress() {
+            const progress = (currentIndex + 1) / currentVerbs.length * 100;
+            const progressElement = document.querySelector(".progress");
+            const progressTextElement = document.getElementById("progress-text");
+            progressElement.style.width = `${progress}%`;
+            progressTextElement.textContent = `${Math.round(progress)}% 完成`;
+            if (progress === 100) {
+                document.getElementById('settle-score').disabled = false;
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < currentVerbs.length) {
+                showQuestion();
+                document.getElementById("answer").value = "";
+                document.getElementById("result").textContent = "";
+            } else {
+                document.getElementById("question").textContent = "本关卡所有单词已背诵完毕！";
+                document.getElementById("answer").disabled = true;
+                document.getElementById("check").disabled = true;
+                document.getElementById("next").disabled = true;
+            }
+        }
+
+        function populateWordList(ulElement) {
+            ulElement.innerHTML = "";
+            allIrregularVerbs.forEach((verb) => {
+                const li = document.createElement("li");
+                li.innerHTML = `${verb[0]}（${verb[3]}） <span class="answer"> - ${verb[1]} - ${verb[2]}</span>`;
+                ulElement.appendChild(li);
+            });
+        }
+
+        function toggleAnswers(button, ulElement) {
+            const answers = ulElement.querySelectorAll(".answer");
+            if (button.textContent === "隐藏答案") {
+                answers.forEach((answer) => {
+                    answer.classList.add("hidden-answer");
+                });
+                button.textContent = "显示答案";
+            } else {
+                answers.forEach((answer) => {
+                    answer.classList.remove("hidden-answer");
+                });
+                button.textContent = "隐藏答案";
+            }
+        }
+
+        function settleScore() {
+            const score = (correctCount / currentVerbs.length) * 100;
+            const scoreText = document.getElementById('score-text');
+            scoreText.textContent = `你的成绩是：${Math.round(score)} 分`;
+
+            const scoreWrongAnswers = document.getElementById('score-wrong-answers');
+            scoreWrongAnswers.innerHTML = "";
+            wrongAnswers.forEach((item) => {
+                const li = document.createElement("li");
+                li.textContent = `${item.verb}: 正确答案 "${item.correctAnswer}"`;
+                scoreWrongAnswers.appendChild(li);
+            });
+
+            const scoreModal = document.getElementById('score-modal');
+            scoreModal.style.display = 'block';
+        }
+
+        function backToMain() {
+            currentLevel = "all";
+            currentVerbs = allIrregularVerbs;
+            currentIndex = 0;
+            correctCount = 0;
+            history.length = 0;
+            wrongAnswers.length = 0;
+            updateHistory();
+            updateWrongAnswers();
+            document.getElementById("level-select").classList.remove("hidden");
+            document.getElementById("quiz").classList.add("hidden");
+            document.getElementById("answer").disabled = false;
+            document.getElementById("check").disabled = false;
+            document.getElementById("next").disabled = false;
+            document.getElementById("answer").value = "";
+            document.getElementById("result").textContent = "";
+            const progressElement = document.querySelector(".progress");
+            const progressTextElement = document.getElementById("progress-text");
+            progressElement.style.width = "0%";
+            progressTextElement.textContent = "0% 完成";
+            document.getElementById('question-select').classList.add('hidden');
+            document.getElementById('settle-score').disabled = true;
+            const scoreModal = document.getElementById('score-modal');
+            scoreModal.style.display = 'none';
+        }
+
+        document.getElementById("start").addEventListener("click", function () {
+            currentLevel = document.getElementById("level").value;
+            currentVerbs = filterVerbs(currentLevel);
+            currentIndex = 0;
+            correctCount = 0;
+            history.length = 0;
+            wrongAnswers.length = 0;
+            updateHistory();
+            updateWrongAnswers();
+            document.getElementById("level-select").classList.add("hidden");
+            document.getElementById("quiz").classList.remove("hidden");
+            showQuestion();
+            document.getElementById("answer").disabled = false;
+            document.getElementById("check").disabled = false;
+            document.getElementById("next").disabled = false;
+            document.getElementById("answer").value = "";
+            document.getElementById("result").textContent = "";
+            const progressElement = document.querySelector(".progress");
+            const progressTextElement = document.getElementById("progress-text");
+            progressElement.style.width = "0%";
+            progressTextElement.textContent = "0% 完成";
+            populateQuestionSelect();
+            document.getElementById('question-select').classList.remove('hidden');
+        });
+
+        document.getElementById("check").addEventListener("click", checkAnswer);
+        document.getElementById("next").addEventListener("click", nextQuestion);
+        document.getElementById("settle-score").addEventListener("click", settleScore);
+        document.getElementById("back-to-main").addEventListener("click", backToMain);
+
+        const wordListModal = document.getElementById("word-list-modal");
+        const openWordListButton = document.getElementById("open-word-list");
+        const closeWordListButton = document.querySelector("#word-list-modal .close");
+        const toggleAnswersModalButton = document.getElementById("toggle-answers-modal");
+        const wordListModalUl = document.getElementById("word-list-modal-ul");
+
+        openWordListButton.addEventListener("click", function () {
+            wordListModal.style.display = "block";
+            populateWordList(wordListModalUl);
+        });
+
+        closeWordListButton.addEventListener("click", function () {
+            wordListModal.style.display = "none";
+        });
+
+        window.addEventListener("click", function (event) {
+            if (event.target === wordListModal) {
+                wordListModal.style.display = "none";
+            }
+        });
+
+        toggleAnswersModalButton.addEventListener("click", function () {
+            toggleAnswers(toggleAnswersModalButton, wordListModalUl);
+        });
+
+        const scoreModal = document.getElementById('score-modal');
+        const closeScoreModalButton = document.querySelector('#score-modal .close');
+
+        closeScoreModalButton.addEventListener('click', function () {
+            scoreModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target === scoreModal) {
+                scoreModal.style.display = 'none';
+            }
+        });
+
+        populateWordList(wordListModalUl);
+    </script>
+<script src="sfx.js"></script>
+</body>
+
+</html>
+    

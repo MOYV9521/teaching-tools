@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成语填空大闯关 · 含音效</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(1200px 600px at 20% -10%, #4c1d95, transparent),
+               radial-gradient(1000px 700px at 110% 110%, #be185d, transparent),
+               linear-gradient(160deg,#170f2e,#241b4e 55%,#2a0f3d); color:#fff; padding:16px; }
+  .wrap { width:min(860px,100%); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+    border-radius:22px; padding:20px 22px 22px; backdrop-filter:blur(8px); box-shadow:0 30px 80px rgba(0,0,0,.45); }
+  header { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  header h1 { font-size:20px; letter-spacing:1px; }
+  header h1 span { font-size:13px; color:#f9a8d4; margin-left:8px; font-weight:400; }
+  .hud { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+  .pill { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); padding:6px 12px; border-radius:99px; font-size:13px; }
+  .pill b { color:#fcd34d; }
+  .bar { height:8px; border-radius:99px; background:rgba(255,255,255,.12); overflow:hidden; margin:6px 0 18px; }
+  .bar i { display:block; height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#ec4899); transition:width .5s; border-radius:99px; }
+  .stage { text-align:center; }
+  .idiom { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin:10px 0 26px; perspective:500px; }
+  .idiom .ch { width:84px; height:96px; background:linear-gradient(160deg,#f8fafc,#e2e8f0); color:#1e293b; border-radius:16px;
+    display:flex; align-items:center; justify-content:center; font-size:52px; font-weight:900; box-shadow:0 10px 26px rgba(0,0,0,.35), inset 0 -6px 0 rgba(0,0,0,.06); }
+  .idiom .ch.blank { background:linear-gradient(160deg,#334155,#1e293b); color:transparent; border:2px dashed #f59e0b; }
+  .idiom .ch.blank.reveal { color:#fbbf24; border-color:#fbbf24; }
+  .idiom .ch.ok { background:linear-gradient(160deg,#d1fae5,#a7f3d0); color:#065f46; }
+  .idiom .ch.bad { background:linear-gradient(160deg,#fee2e2,#fecaca); color:#991b1b; animation:shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-9px)} 75%{transform:translateX(9px)} }
+  .opts { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; max-width:680px; margin:0 auto; }
+  .opt { padding:15px; font-size:26px; font-weight:900; border-radius:14px; background:rgba(255,255,255,.09);
+    border:1px solid rgba(255,255,255,.2); color:#fff; cursor:pointer; transition:.15s; letter-spacing:2px; }
+  .opt:hover { background:#7c3aed; border-color:#a78bfa; transform:translateY(-2px); }
+  .opt:disabled { opacity:.45; cursor:default; transform:none; }
+  .opt.correct { background:#059669 !important; border-color:#34d399; }
+  .opt.wrong { background:#dc2626 !important; border-color:#fca5a5; }
+  .panel { margin-top:20px; min-height:64px; display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px 18px; }
+  .panel .meaning { font-size:14px; color:#e2e8f0; line-height:1.8; }
+  .panel .meaning b { color:#fcd34d; font-size:17px; }
+  .panel .full { font-size:16px; color:#f9a8d4; font-weight:700; letter-spacing:2px; }
+  .next-btn { margin-top:16px; padding:11px 30px; border-radius:12px; border:0; background:linear-gradient(90deg,#f59e0b,#ec4899);
+    color:#fff; font-size:15px; font-weight:700; cursor:pointer; display:none; }
+  .next-btn:hover { filter:brightness(1.12); }
+  footer { margin-top:16px; color:rgba(255,255,255,.55); font-size:12px; text-align:center; }
+  /* 开始 / 结算遮罩 */
+  .ov { position:fixed; inset:0; background:rgba(10,8,24,.78); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:20; padding:20px; text-align:center; }
+  .ov h2 { font-size:30px; margin-bottom:14px; }
+  .ov p { color:#cbd5e1; line-height:2; margin-bottom:18px; }
+  .ov .bigbtn { padding:14px 44px; font-size:18px; border-radius:14px; border:0; cursor:pointer; font-weight:800; color:#fff;
+    background:linear-gradient(90deg,#f59e0b,#ec4899); box-shadow:0 12px 30px rgba(236,72,153,.4); }
+  .ov .bigbtn:hover { filter:brightness(1.12); }
+  .rank { font-size:40px; margin:4px 0 10px; }
+  .statline { font-size:15px; color:#e2e8f0; margin-bottom:6px; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>成语填空大闯关<span>🎯 含音效 · 巩固课内成语</span></h1>
+    <div class="hud">
+      <div class="pill">第 <b id="cur">1</b>/10</div>
+      <div class="pill">🔥 连对 <b id="streak">0</b></div>
+      <div class="pill">🏆 得分 <b id="score">0</b></div>
+      <div class="pill">🥇 最佳 <b id="best">0</b></div>
+    </div>
+  </header>
+  <div class="bar"><i id="barI"></i></div>
+
+  <div class="stage">
+    <div class="idiom" id="idiomBox"></div>
+    <div class="opts" id="optBox"></div>
+    <div class="panel hidden" id="panel">
+      <div class="full" id="fullAns"></div>
+      <div class="meaning" id="meaning"></div>
+    </div>
+    <button class="next-btn" id="btnNext">下一题 ➜</button>
+  </div>
+  <footer>每局 10 题 · 选出成语中缺掉的那个字 · 不会的看一眼释义就记住啦</footer>
+</div>
+
+<!-- 开始 -->
+<div class="ov" id="ovStart">
+  <h2>🎋 成语填空大闯关</h2>
+  <p>成语中缺了一个字，从四个选项里选出正确的。<br>答对连击加分，答错看释义，<b>一局 10 题</b>，比比谁的得分高！</p>
+  <button class="bigbtn" id="btnStart">开 始 闯 关</button>
+</div>
+<!-- 结算 -->
+<div class="ov hidden" id="ovEnd">
+  <div class="rank" id="rankEmoji">🏆</div>
+  <h2 id="rankTitle">通关啦！</h2>
+  <div class="statline">本局得分：<b style="color:#fcd34d" id="fScore">0</b>　·　答对 <b id="fRight">0</b> / 10　·　最长连对 <b id="fStreak">0</b></div>
+  <div class="statline">历史最佳：<b id="fBest">0</b> 分</div>
+  <p id="rankNote"></p>
+  <button class="bigbtn" id="btnAgain">🔁 再来一局</button>
+</div>
+
+<script>
+/* ---- 轻量音效（Web Audio 合成，无需文件） ---- */
+var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+function ac(){ if(!actx){ if(!AC) return null; actx = new AC(); } if(actx.state === "suspended") actx.resume(); return actx; }
+function tone(f,d,ty,g){ var c=ac(); if(!c) return; var t=c.currentTime, o=c.createOscillator(), v=c.createGain();
+  o.type=ty||"sine"; o.frequency.value=f; v.gain.setValueAtTime(.0001,t); v.gain.exponentialRampToValueAtTime(g||.12,t+.015);
+  v.gain.exponentialRampToValueAtTime(.0001,t+d); o.connect(v); v.connect(c.destination); o.start(t); o.stop(t+d+.05); }
+var S = {
+  click:function(){ tone(540,.06,"triangle",.08); },
+  correct:function(){ var t=ac().currentTime; tone(660,.12); tone(880,.16); tone(1180,.2); },
+  wrong:function(){ tone(196,.2,"sawtooth",.09); tone(148,.3,"sawtooth",.09); },
+  win:function(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){ tone(f,.3); }, i*130); }); }
+};
+
+/* ---- 题库：w 成语  k 缺字  m 释义 ---- */
+var POOL = [
+  {w:"守株待兔",k:"兔",m:"守着树桩等兔子，比喻死守狭隘经验、妄想不劳而获。"},
+  {w:"画蛇添足",k:"足",m:"画蛇时多画了脚，比喻做了多余的事。"},
+  {w:"亡羊补牢",k:"牢",m:"羊丢了再去修补羊圈，比喻出了问题及时补救。"},
+  {w:"刻舟求剑",k:"舟",m:"在船上刻记号找剑，比喻方法刻板不知变通。"},
+  {w:"掩耳盗铃",k:"耳",m:"捂住耳朵偷铃铛，比喻自己欺骗自己。"},
+  {w:"井底之蛙",k:"蛙",m:"井底的青蛙，比喻眼界狭小的人。"},
+  {w:"拔苗助长",k:"苗",m:"把禾苗拔高帮它生长，比喻违反规律急于求成。"},
+  {w:"自相矛盾",k:"矛",m:"说话做事前后抵触、互相冲突。"},
+  {w:"狐假虎威",k:"虎",m:"狐狸借老虎的威风，比喻依仗别人势力吓唬人。"},
+  {w:"对牛弹琴",k:"牛",m:"对着牛弹琴，比喻对不懂道理的人讲道理。"},
+  {w:"惊弓之鸟",k:"鸟",m:"被弓箭吓怕了的鸟，比喻受过惊吓、遇事害怕的人。"},
+  {w:"画龙点睛",k:"睛",m:"比喻写文章或说话时，在关键处加上精辟语句，使内容更生动。"},
+  {w:"叶公好龙",k:"龙",m:"表面喜欢龙、其实害怕龙，比喻口头上爱好某事物，实际并不真爱好。"},
+  {w:"滥竽充数",k:"竽",m:"不会吹竽的人混在乐队里充数，比喻没有真才实学的人混在行家里面。"},
+  {w:"杯弓蛇影",k:"弓",m:"把酒杯中的弓影当成蛇，比喻疑神疑鬼、自相惊扰。"},
+  {w:"买椟还珠",k:"椟",m:"买了匣子退还珍珠，比喻取舍不当、抓了次要的丢了主要的。"},
+  {w:"一鸣惊人",k:"鸣",m:"一叫就使人震惊，比喻平时没有突出表现，一下子做出惊人的成绩。"},
+  {w:"唇亡齿寒",k:"齿",m:"嘴唇没有了，牙齿就会感到冷，比喻关系密切、利害相关。"},
+  {w:"守口如瓶",k:"瓶",m:"守口像瓶口一样严密，形容说话谨慎、严守秘密。"},
+  {w:"半途而废",k:"途",m:"走到半路就停止，比喻做事不能坚持到底。"},
+  {w:"百发百中",k:"中",m:"射箭每次都命中目标，比喻做事有充分把握。"},
+  {w:"胸有成竹",k:"成",m:"画竹子前心里已有竹子的样子，比喻做事之前已有成熟的考虑。"},
+  {w:"三顾茅庐",k:"茅",m:"三次到草屋去拜访，比喻真心诚意地一再邀请。"},
+  {w:"卧薪尝胆",k:"薪",m:"睡柴草尝苦胆，形容刻苦自励、发愤图强。"},
+  {w:"闻鸡起舞",k:"鸡",m:"听到鸡叫就起来练武，比喻有志气的人及时奋发。"},
+  {w:"望梅止渴",k:"梅",m:"想到梅子就流口水解渴，比喻用空想安慰自己。"},
+  {w:"纸上谈兵",k:"兵",m:"在纸面上谈论打仗，比喻空谈理论、不能解决实际问题。"},
+  {w:"神机妙算",k:"算",m:"形容善于估计形势、策略高明。"},
+  {w:"程门立雪",k:"雪",m:"站在雪中等待老师，形容尊师重道、诚心求学。"},
+  {w:"老马识途",k:"途",m:"老马认识走过的路，比喻有经验的人对情况熟悉、能起引导作用。"}
+];
+
+var pool = POOL.slice(), idx = 0, round = 0, score = 0, streak = 0, maxStreak = 0, right = 0;
+var TARGET = 10;
+var $ = function (id){ return document.getElementById(id); };
+var best = parseInt(localStorage.getItem("idiom_best") || "0", 10);
+$("best").textContent = best;
+
+function shuffle(a){ for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pick(q){
+  var opts = [q.k];
+  var cand = "花鸟鱼虫山水风云日月天地心手耳目口人牛马龙凤虎兔冰雪梅竹灯火字句文章学业家园美明善真红青白黑";
+  while (opts.length < 4){
+    var c = cand[Math.floor(Math.random() * cand.length)];
+    if (opts.indexOf(c) < 0) opts.push(c);
+  }
+  return shuffle(opts);
+}
+
+function render(){
+  if (idx >= pool.length) { pool = POOL.slice(); shuffle(pool); idx = 0; }
+  var q = pool[idx];
+  $("cur").textContent = round + 1;
+  var pos = q.w.indexOf(q.k);
+  var chars = q.w.split("");
+  var html = "";
+  chars.forEach(function (ch, i){
+    var blank = (ch === q.k);
+    html += '<div class="ch' + (blank ? " blank" : "") + (pos === i ? " tg" : "") + '" data-k="' + ch + '">' + ch + '</div>';
+  });
+  $("idiomBox").innerHTML = html;
+  $("optBox").innerHTML = "";
+  pick(q).forEach(function (c){
+    var b = document.createElement("button");
+    b.className = "opt"; b.textContent = c; b.dataset.v = c;
+    b.onclick = function (){ answer(c, b); };
+    $("optBox").appendChild(b);
+  });
+  $("panel").classList.add("hidden");
+  $("btnNext").style.display = "none";
+  $("barI").style.width = (round / TARGET * 100) + "%";
+}
+
+function answer(c, btn){
+  var q = pool[idx];
+  var opts = document.querySelectorAll(".opt");
+  opts.forEach(function (o){ o.disabled = true; });
+  if (c === q.k){
+    btn.classList.add("correct");
+    score += 10 + streak * 2; streak++; maxStreak = Math.max(maxStreak, streak); right++;
+    S.correct();
+    mark(q, true);
+  } else {
+    btn.classList.add("wrong");
+    streak = 0; S.wrong();
+    opts.forEach(function (o){ if (o.dataset.v === q.k) o.classList.add("correct"); });
+    mark(q, false);
+  }
+  $("score").textContent = score;
+  $("streak").textContent = streak;
+}
+
+function mark(q, ok){
+  document.querySelectorAll(".ch.blank").forEach(function (el){ el.classList.add("reveal"); if (ok) el.classList.add("ok"); else el.classList.add("bad"); });
+  $("fullAns").textContent = ok ? "回答正确！" : "正确答案：" + q.w;
+  $("meaning").innerHTML = "释义：" + q.m;
+  $("panel").classList.remove("hidden");
+  setTimeout(function (){ showNext(); }, ok ? 1200 : 2400);
+}
+function showNext(){
+  round++;
+  if (round >= TARGET) { finish(); return; }
+  idx++;
+  render();
+}
+function finish(){
+  if (score > best){ best = score; localStorage.setItem("idiom_best", best); }
+  $("fScore").textContent = score; $("fRight").textContent = right; $("fStreak").textContent = maxStreak; $("fBest").textContent = best;
+  var ratio = right / TARGET;
+  var rank = ratio === 1 ? "🏆" : ratio >= .8 ? "🥇" : ratio >= .5 ? "🥈" : "🥉";
+  $("rankEmoji").textContent = rank;
+  $("rankTitle").textContent = ratio === 1 ? "满分通关，太厉害啦！" : ratio >= .8 ? "真棒，继续保持！" : ratio >= .5 ? "不错，再温习一遍更好" : "别灰心，释义都给你了，再来！";
+  $("rankNote").innerHTML = ratio >= .8 ? "你是成语小达人 ✨" : "记住释义，下一局你就是满分选手 💪";
+  S.win();
+  $("ovEnd").classList.remove("hidden");
+}
+function resetGame(){
+  pool = POOL.slice(); shuffle(pool); idx = 0; round = 0; score = 0; streak = 0; maxStreak = 0; right = 0;
+  $("score").textContent = 0; $("streak").textContent = 0;
+  $("ovStart").classList.add("hidden"); $("ovEnd").classList.add("hidden");
+  render();
+}
+
+document.addEventListener("pointerdown", function(){ ac(); }, { once:true, capture:true });
+$("btnStart").onclick = function(){ S.click(); resetGame(); };
+$("btnAgain").onclick = function(){ S.click(); resetGame(); };
+$("btnNext").onclick = function(){ S.click(); showNext(); };
+</script>
+</body>
+</html>

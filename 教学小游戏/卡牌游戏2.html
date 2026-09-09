@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>汉字拼音翻翻乐</title>
+  <style>
+    /* CSS样式 */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 24px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-front {
+      background-color: #f0f0f0;
+    }
+
+    .card-back {
+      background-color: #e0e0e0;
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body>
+  <h1>汉字拼音翻翻乐</h1>
+  <div id="card-grid"></div>
+
+  <script>
+    // JavaScript代码
+    const cardData = [
+      { character: "你好", pinyin: "nǐ hǎo" },
+      { character: "谢谢", pinyin: "xiè xie" },
+      { character: "再见", pinyin: "zài jiàn" },
+      { character: "学校", pinyin: "xué xiào" },
+      { character: "老师", pinyin: "lǎo shī" },
+      { character: "学生", pinyin: "xué sheng" },
+      { character: "朋友", pinyin: "péng you" },
+      { character: "家庭", pinyin: "jiā tíng" },
+    ];
+
+    const cardGrid = document.getElementById('card-grid');
+
+    // 动态生成卡牌
+    cardData.forEach((data) => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      const cardInner = document.createElement('div');
+      cardInner.classList.add('card-inner');
+
+      const cardFront = document.createElement('div');
+      cardFront.classList.add('card-face', 'card-front');
+      cardFront.textContent = data.character;
+
+      const cardBack = document.createElement('div');
+      cardBack.classList.add('card-face', 'card-back');
+      cardBack.textContent = data.pinyin;
+
+      cardInner.appendChild(cardFront);
+      cardInner.appendChild(cardBack);
+      card.appendChild(cardInner);
+
+      // 点击卡牌时翻转并播放拼音发音
+      card.addEventListener('click', () => {
+        if (!card.classList.contains('flipped')) {
+          card.classList.add('flipped');
+          speak(data.pinyin); // 播放拼音发音
+        } else {
+          card.classList.remove('flipped'); // 再次点击时复原
+        }
+      });
+
+      cardGrid.appendChild(card);
+    });
+
+    // 使用Web Speech API播放拼音发音
+    function speak(text) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN'; // 设置语言为中文
+      synth.speak(utterance);
+    }
+  </script>
+<script src="sfx.js"></script>
+</body>
+</html>

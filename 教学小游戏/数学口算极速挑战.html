@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学口算极速挑战</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif; }
+  body { background: linear-gradient(150deg,#0b1220,#13244d 55%,#0d1b36); color:#eef3ff; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
+  .back { position:fixed; top:16px; left:16px; background:rgba(255,255,255,.08); color:#bfd2ff; border:1px solid rgba(255,255,255,.2);
+    padding:8px 14px; border-radius:10px; font-size:13px; text-decoration:none; backdrop-filter:blur(6px); z-index:20; }
+  .back:hover{ background:rgba(255,255,255,.18); color:#fff; }
+  .shell { width:100%; max-width:520px; text-align:center; }
+  .logo { font-size:34px; font-weight:900; letter-spacing:1px; }
+  .logo span { color:#ffc94d; }
+  .logo small{ display:block; font-size:12px; letter-spacing:4px; color:#8aa1d6; margin-top:4px; font-weight:700;}
+  .card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:22px;
+    padding:28px; margin-top:26px; backdrop-filter:blur(8px); }
+  /* 选关 */
+  .opt { text-align:left; margin:14px 0; }
+  .opt>label{ font-size:13px; color:#9db4e8; font-weight:700; letter-spacing:1px; }
+  .group { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .gbtn { flex:1; min-width:70px; padding:11px 6px; border-radius:12px; background:rgba(255,255,255,.05);
+    color:#cddcff; border:1px solid rgba(255,255,255,.14); font-size:15px; font-weight:700; cursor:pointer; transition:.2s; }
+  .gbtn:hover{ background:rgba(255,255,255,.12); }
+  .gbtn.on { background:linear-gradient(135deg,#ffc94d,#ff9d3d); color:#20243a; border-color:transparent; box-shadow:0 6px 18px rgba(255,180,60,.35); }
+  .go { width:100%; margin-top:8px; padding:15px; border:none; border-radius:14px; font-size:18px; font-weight:900; color:#20243a;
+    background:linear-gradient(120deg,#4dd0ff,#4e6bff); cursor:pointer; box-shadow:0 8px 24px rgba(78,120,255,.4); transition:.2s; }
+  .go:hover{ transform:translateY(-2px); filter:brightness(1.1); }
+  /* HUD */
+  .hud { display:flex; justify-content:space-between; align-items:center; }
+  .hud .score{ font-size:26px; font-weight:900; color:#4dd0ff; }
+  .hud .combo{ font-size:15px; font-weight:800; color:#ff9d6b; }
+  .bar { height:10px; background:rgba(255,255,255,.1); border-radius:99px; margin:16px 0 22px; overflow:hidden; }
+  .bar i { display:block; height:100%; width:100%; background:linear-gradient(90deg,#4dd0ff,#6f5bff,#ff6b9d);
+    transition:width .1s linear; }
+  .q { font-size:clamp(38px,9vw,58px); font-weight:900; letter-spacing:3px; margin:6px 0 4px; }
+  .q small{ font-size:16px; color:#8aa1d6; }
+  .answer { display:flex; gap:10px; margin-top:20px; }
+  .answer input { flex:1; padding:15px 18px; font-size:26px; font-weight:800; text-align:center; color:#fff;
+    background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.22); border-radius:14px; outline:none; }
+  .answer input:focus{ border-color:#4dd0ff; box-shadow:0 0 0 3px rgba(77,208,255,.2); }
+  .answer button{ padding:0 26px; border:none; border-radius:14px; font-size:17px; font-weight:900; color:#20243a;
+    background:linear-gradient(135deg,#4dd0ff,#4e6bff); cursor:pointer; }
+  .right{ animation:pop .3s; } .wrong{ animation:shake .4s; }
+  .feed{ min-height:24px; margin-top:14px; font-size:15px; font-weight:700; }
+  .feed.ok{ color:#54e8a5; } .feed.no{ color:#ff7b7b; }
+  @keyframes shake{ 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-9px)} 40%,80%{transform:translateX(9px)} }
+  @keyframes pop{ 0%{transform:scale(1)} 40%{transform:scale(1.07)} }
+  .res-card .star{ font-size:56px; }
+  .res-row{ display:flex; justify-content:space-between; padding:11px 4px; border-bottom:1px dashed rgba(255,255,255,.14); font-size:15px; }
+  .res-row b{ color:#ffc94d; }
+  .hidden{ display:none; }
+  .again{ margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+  .again button{ padding:12px 26px; border-radius:12px; border:none; font-weight:800; font-size:15px; cursor:pointer; }
+  .b1{ background:linear-gradient(120deg,#4dd0ff,#4e6bff); color:#20243a; }
+  .b2{ background:rgba(255,255,255,.1); color:#cddcff; border:1px solid rgba(255,255,255,.2); }
+</style>
+</head>
+<body>
+<a class="back" href="../index.html#library" target="_top">‹ 返回展厅</a>
+<div class="shell">
+  <div class="logo">口算<span>极速</span>挑战<small>MENTAL MATH RUSH</small></div>
+
+  <div class="card" id="startCard">
+    <div class="opt"><label>运算类型</label>
+      <div class="group" id="opGroup">
+        <button class="gbtn on" data-v="+">加法</button>
+        <button class="gbtn" data-v="-">减法</button>
+        <button class="gbtn" data-v="×">乘法</button>
+        <button class="gbtn" data-v="÷">除法</button>
+        <button class="gbtn" data-v="mix">混合</button>
+      </div>
+    </div>
+    <div class="opt"><label>难度（数字范围）</label>
+      <div class="group" id="dfGroup">
+        <button class="gbtn on" data-v="1">轻松</button>
+        <button class="gbtn" data-v="2">进阶</button>
+        <button class="gbtn" data-v="3">挑战</button>
+      </div>
+    </div>
+    <button class="go" id="startBtn">▶ 开始挑战（60 秒）</button>
+  </div>
+
+  <div class="card hidden" id="gameCard">
+    <div class="hud"><div class="score" id="score">0</div><div class="combo" id="combo">连击 ×0</div></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="q" id="question">12 + 34 = ?</div>
+    <div class="answer"><input id="inp" type="number" inputmode="numeric" placeholder="输入答案"><button id="ok">确定</button></div>
+    <div class="feed" id="feed"></div>
+  </div>
+
+  <div class="card res-card hidden" id="resCard">
+    <div class="star" id="star">🏆</div>
+    <h2 id="resTitle" style="margin-top:6px;">挑战结束</h2>
+    <div style="margin:18px 0;">
+      <div class="res-row"><span>最终得分</span><b id="rScore">0</b></div>
+      <div class="res-row"><span>答对 / 总题</span><b id="rAcc">0/0</b></div>
+      <div class="res-row"><span>正确率</span><b id="rRate">0%</b></div>
+      <div class="res-row"><span>最高连击</span><b id="rCombo">0</b></div>
+      <div class="res-row"><span>历史最佳分</span><b id="rBest">0</b></div>
+    </div>
+    <div class="again"><button class="b1" id="againBtn">再玩一次</button><button class="b2" id="homeBtn">换难度 / 模式</button></div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+let op=localStorage.getItem("mathOp")||"+", df=+localStorage.getItem("mathDf")||1;
+const OP={"+":1,"-":1,"×":1,"÷":1,mix:1};
+function setOpGroup(){ document.querySelectorAll("#opGroup .gbtn").forEach(b=>b.classList.toggle("on",b.dataset.v===op)); }
+function setDfGroup(){ document.querySelectorAll("#dfGroup .gbtn").forEach(b=>b.classList.toggle("on",+b.dataset.v===df)); }
+setOpGroup(); setDfGroup();
+$("#opGroup").addEventListener("click",e=>{ if(e.target.dataset.v){ op=e.target.dataset.v; setOpGroup(); }});
+$("#dfGroup").addEventListener("click",e=>{ if(e.target.dataset.v){ df=+e.target.dataset.v; setDfGroup(); }});
+
+/* 出题 */
+function range(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
+function makeQ(){
+  const o= op==="mix" ? ["+","-","×","÷"][range(0,3)] : op;
+  let a,b,text,ans;
+  const R=[[9,40],[20,99],[30,199]][df-1];   // 数值区间
+  if(o==="+"){ a=range(R[0],R[1]); b=range(R[0],R[1]); text=a+" + "+b+" = ?"; ans=a+b; }
+  else if(o==="-"){ a=range(R[0],R[1]); b=range(R[0],R[1]); if(a<b)[a,b]=[b,a]; text=a+" − "+b+" = ?"; ans=a-b; }
+  else if(o==="×"){ const m=df===1?[2,5]:[2,9]; a=range(m[0],m[1]); b=range(df===1?2:3,df===1?5:9); text=a+" × "+b+" = ?"; ans=a*b; }
+  else { const d=[2,3,4,5,6,7,8,9][range(0,df===1?4:7)]; const q=range(df===1?2:3,df===1?9:12); a=d*q; b=d; text=a+" ÷ "+b+" = ?"; ans=q; }
+  return {text,ans,o};
+}
+
+let score=0,combo=0,right=0,total=0,maxCombo=0,timer,left=60,q;
+function start(){
+  score=0;combo=0;right=0;total=0;maxCombo=0;left=60;
+  localStorage.setItem("mathOp",op); localStorage.setItem("mathDf",df);
+  $("#startCard").classList.add("hidden"); $("#resCard").classList.add("hidden"); $("#gameCard").classList.remove("hidden");
+  $("#score").textContent=0; $("#combo").textContent="连击 ×0"; $("#bar").style.width="100%"; $("#bar").style.opacity=1;
+  $("#inp").value=""; $("#feed").textContent="";
+  nextQ(); tick(); timer=setInterval(tick,1000); $("#inp").focus();
+}
+function tick(){
+  left--; $("#bar").style.width=(left/60*100)+"%";
+  if(left<=10) $("#bar").style.opacity=left%2? .5:1;
+  if(left<=0){ clearInterval(timer); finish(); }
+}
+function nextQ(){ q=makeQ(); $("#question").innerHTML=q.text.replace(" = ?",'<span style="color:#ffc94d;"> = ?</span>'); $("#inp").value=""; $("#inp").focus(); }
+function submit(){
+  if(!q)return; const v=parseInt($("#inp").value,10); if(isNaN(v))return; total++;
+  if(v===q.ans){ right++; combo++; if(combo>maxCombo)maxCombo=combo;
+    let add=10+Math.floor(combo/3)*5; score+=add;
+    $("#score").textContent=score; $("#combo").textContent="连击 ×"+combo;
+    $("#feed").className="feed ok"; $("#feed").textContent="回答正确 +"+add+" 分";
+    nextQ();
+  }else{ combo=0; $("#combo").textContent="连击 ×0";
+    $("#feed").className="feed no";
+    $("#feed").textContent="正确答案是 "+(q.text.replace(" = ?","")+" = "+q.ans)+"，下一题继续！";
+    $("#inp").classList.remove("wrong"); void $("#inp").offsetWidth; $("#inp").classList.add("wrong");
+    setTimeout(nextQ,900);
+  }
+}
+$("#startBtn").onclick=start;
+$("#ok").onclick=submit;
+$("#inp").addEventListener("keydown",e=>{ if(e.key==="Enter")submit(); });
+$("#againBtn").onclick=start;
+$("#homeBtn").onclick=()=>{ clearInterval(timer); $("#gameCard").classList.add("hidden"); $("#resCard").classList.add("hidden"); $("#startCard").classList.remove("hidden"); };
+function finish(){
+  const rate=total?Math.round(right/total*100):0;
+  const star= score>=600?"🏆":score>=400?"🥇":score>=220?"🥈":score>=100?"🥉":"💪";
+  const title= score>=600?"口算极速王者":score>=400?"口算高手":score>=220?"相当不错":score>=100?"继续加油":"再来一轮！";
+  $("#star").textContent=star; $("#resTitle").textContent=title;
+  $("#rScore").textContent=score; $("#rAcc").textContent=right+" / "+total;
+  $("#rRate").textContent=rate+"%"; $("#rCombo").textContent="×"+maxCombo;
+  const best=+localStorage.getItem("mathBest")||0; if(score>best)localStorage.setItem("mathBest",score);
+  $("#rBest").textContent=Math.max(best,score);
+  $("#gameCard").classList.add("hidden"); $("#resCard").classList.remove("hidden");
+}
+</script>
+<script src="sfx.js"></script>
+</body>
+</html>

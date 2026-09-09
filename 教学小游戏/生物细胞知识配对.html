@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生物细胞结构知识配对</title>
+<style>
+  *{ margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif; }
+  body{ background:linear-gradient(160deg,#08130d,#0e2215 55%,#0a1a12); color:#e8f5ec; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; padding:24px 12px; }
+  .back{ position:fixed; top:16px; left:16px; background:rgba(255,255,255,.07); color:#b9e6c8; border:1px solid rgba(255,255,255,.18);
+    padding:8px 14px; border-radius:10px; font-size:13px; text-decoration:none; z-index:20; }
+  .back:hover{ background:rgba(255,255,255,.15); color:#fff; }
+  h1{ font-size:26px; text-align:center; }
+  h1 span{ color:#5fd68a; }
+  .sub{ color:#7fae90; font-size:13px; text-align:center; margin-top:6px; }
+  .tip-line{ text-align:center; color:#9cc8ab; font-size:13px; margin-top:12px; background:rgba(95,214,138,.1);
+    border:1px dashed rgba(95,214,138,.35); padding:8px 14px; border-radius:10px; width:100%; max-width:680px; }
+  .hud{ display:flex; justify-content:space-between; width:100%; max-width:680px; margin-top:16px; font-size:14px; color:#8fb89d; }
+  .hud b{ color:#5fd68a; font-size:17px; }
+  .fields{ display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:680px; margin-top:16px; }
+  .col h3{ font-size:13px; letter-spacing:2px; color:#7fae90; margin-bottom:8px; }
+  .pairs{ display:flex; flex-direction:column; gap:8px; }
+  .item{ padding:12px 12px; border-radius:11px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05);
+    font-size:14px; line-height:1.5; cursor:pointer; transition:.15s; user-select:none; }
+  .item:hover{ background:rgba(255,255,255,.1); }
+  .item.sel{ border-color:#5fd68a; background:rgba(95,214,138,.15); box-shadow:0 0 0 1px #5fd68a; }
+  .item.paired{ opacity:.45; border-color:rgba(95,214,138,.55); background:rgba(95,214,138,.1); cursor:default; pointer-events:none; }
+  .item.paired::after{ content:"  ✓"; color:#5fd68a; font-weight:900; }
+  .item.err{ border-color:#ff7a6e; background:rgba(255,122,110,.18); animation:shake .4s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-7px)}50%{transform:translateX(7px)} }
+  .btn{ margin-top:20px; padding:13px 34px; border:none; border-radius:13px; font-size:15px; font-weight:800; cursor:pointer;
+    background:linear-gradient(120deg,#5fd68a,#2fa866); color:#06220f; box-shadow:0 8px 22px rgba(47,168,102,.3); }
+  .btn:hover{ filter:brightness(1.1); transform:translateY(-2px); }
+  .mask{ position:fixed; inset:0; background:rgba(4,10,6,.92); display:none; align-items:center; justify-content:center; z-index:60; padding:20px; }
+  .mask.on{ display:flex; }
+  .box{ background:#0f2417; border:1px solid rgba(95,214,138,.4); padding:34px; border-radius:22px; text-align:center; max-width:430px; width:100%; }
+  .box .star{ font-size:52px; }
+  .box h2{ margin-top:6px; }
+  .rrow{ display:flex; justify-content:space-between; padding:10px 2px; border-bottom:1px dashed rgba(255,255,255,.14); }
+  .rrow b{ color:#5fd68a; }
+</style>
+</head>
+<body>
+<a class="back" href="../index.html#library" target="_top">‹ 返回展厅</a>
+<h1>细胞结构 · <span>知识配对</span></h1>
+<div class="sub">左边选一个细胞结构 → 右边点出对应的功能</div>
+<div class="tip-line">💡 先点任一侧（结构或功能），再点另一侧对应项；配对成功会锁定，点错会抖动提醒。</div>
+<div class="hud"><span>已配对 <b id="done">0</b> / 8</span><span>失误 <b id="errs">0</b> 次</span><span>用时 <b id="timer">00:00</b></span></div>
+
+<div class="fields">
+  <div class="col"><h3>① 细胞结构</h3><div class="pairs" id="names"></div></div>
+  <div class="col"><h3>② 主要功能</h3><div class="pairs" id="funcs"></div></div>
+</div>
+<button class="btn" id="reset">重新配对</button>
+
+<div class="mask" id="mask"><div class="box">
+  <div class="star" id="star">🧬</div>
+  <h2 id="mt">配对完成！</h2>
+  <div style="margin:16px 0;">
+    <div class="rrow"><span>失误次数</span><b id="me">0</b></div>
+    <div class="rrow"><span>用时</span><b id="mtm">00:00</b></div>
+    <div class="rrow"><span>掌握评级</span><b id="mrank">—</b></div>
+  </div>
+  <button class="btn" id="again">再来一次</button>
+</div></div>
+
+<script>
+const PAIRS=[
+  ["细胞壁","保护和支持细胞，使植物细胞有固定形状（植物细胞特有）"],
+  ["细胞膜","控制物质进出细胞，起保护作用"],
+  ["细胞质","生命活动的主要场所，缓缓流动可加速物质交换"],
+  ["细胞核","细胞遗传和代谢的控制中心，内含遗传物质 DNA"],
+  ["线粒体","呼吸作用的主要场所，为生命活动提供能量"],
+  ["叶绿体","进行光合作用、制造有机物的场所（植物细胞特有）"],
+  ["液泡","内含细胞液，溶解着糖类、色素等多种物质"],
+  ["核糖体","合成蛋白质的场所"]
+];
+const $=s=>document.querySelector(s);
+let used=[],selName=null,selFunc=null,errs=0,sec=0,tmr;
+
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function fmt(s){ return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+function init(){
+  clearInterval(tmr); used=[]; selName=null; selFunc=null; errs=0; sec=0;
+  $("#done").textContent="0"; $("#errs").textContent="0"; $("#timer").textContent="00:00"; $("#mask").classList.remove("on");
+  const order=shuffle(PAIRS.map((_,i)=>i));
+  $("#names").innerHTML=PAIRS.map((p,i)=>`<div class="item" data-kind="n" data-idx="${i}">${p[0]}</div>`).join("");
+  $("#funcs").innerHTML=order.map(i=>`<div class="item" data-kind="f" data-idx="${i}">${PAIRS[i][1]}</div>`).join("");
+  document.querySelectorAll(".item").forEach(el=>el.onclick=()=>pick(el));
+  tmr=setInterval(()=>{ sec++; $("#timer").textContent=fmt(sec); },1000);
+}
+function pick(el){
+  if(el.classList.contains("paired")) return;
+  const kind=el.dataset.kind, idx=+el.dataset.idx;
+  if(kind==="n"){
+    if(selFunc!==null){ used.splice(used.indexOf(selFunc),1); document.querySelector(`[data-kind="f"][data-idx="${selFunc}"]`).classList.remove("sel"); selFunc=null; }
+    document.querySelectorAll('[data-kind="n"].sel').forEach(x=>x.classList.remove("sel"));
+    if(selName===idx){ selName=null; el.classList.remove("sel"); return; }
+    selName=idx; el.classList.add("sel");
+  }else{
+    if(selName!==null){ used.splice(used.indexOf(selName),1); document.querySelector(`[data-kind="n"][data-idx="${selName}"]`).classList.remove("sel"); selName=null; }
+    document.querySelectorAll('[data-kind="f"].sel').forEach(x=>x.classList.remove("sel"));
+    if(selFunc===idx){ selFunc=null; el.classList.remove("sel"); return; }
+    selFunc=idx; el.classList.add("sel");
+  }
+  if(selName!==null && selFunc!==null){
+    if(selName===selFunc){ pair(); }
+    else{ errs++; $("#errs").textContent=errs; markErr(selName,"n"); markErr(selFunc,"f"); }
+  }
+}
+function markErr(idx,kind){
+  const el=document.querySelector(`[data-kind="${kind}"][data-idx="${idx}"]`);
+  el.classList.add("err"); setTimeout(()=>el.classList.remove("err"),450);
+  setTimeout(()=>{ el.classList.remove("sel"); if(kind==="n")selName=null; else selFunc=null; },300);
+}
+function pair(){
+  const n=document.querySelector(`[data-kind="n"][data-idx="${selName}"]`);
+  const f=document.querySelector(`[data-kind="f"][data-idx="${selFunc}"]`);
+  n.classList.add("paired"); f.classList.add("paired"); n.classList.remove("sel"); f.classList.remove("sel");
+  used.push(selName,selFunc); selName=null; selFunc=null;
+  $("#done").textContent=used.length/2;
+  if(used.length===PAIRS.length*2) win();
+}
+function win(){
+  clearInterval(tmr);
+  const star= errs===0?"🏆":errs<=3?"🥇":errs<=6?"🥈":"🌱";
+  const rank= errs===0?"一次配对，细胞达人！":errs<=3?"很熟练！":errs<=6?"继续熟悉吧":"别急，多练几遍";
+  $("#star").textContent=star; $("#me").textContent=errs+" 次"; $("#mtm").textContent=fmt(sec); $("#mrank").textContent=rank;
+  $("#mask").classList.add("on");
+}
+$("#reset").onclick=init; $("#again").onclick=init;
+init();
+</script>
+<script src="sfx.js"></script>
+</body>
+</html>

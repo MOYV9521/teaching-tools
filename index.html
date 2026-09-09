@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>趣学工坊 · 互动教学作品展厅</title>
+<meta name="description" content="一位老师的互动教学游戏作品集——把知识点做成好玩的小游戏，点击即玩。">
+<style>
+  /* ============ 基础 ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #070a13;
+    --panel: #0c1120;
+    --panel-2: #111a2e;
+    --line: rgba(255,255,255,.08);
+    --line-2: rgba(255,255,255,.14);
+    --txt: #e9edf7;
+    --muted: #8fa0bb;
+    --acc: #7c5cff;
+    --cy: #22d3ee;
+    --pk: #f472b6;
+    --gr: linear-gradient(120deg, var(--cy), var(--acc) 55%, var(--pk));
+    --r: 16px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--txt);
+    font-family: var(--font);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  ::selection { background: rgba(124,92,255,.45); }
+
+  /* 背景网格 + 光晕 */
+  .bgfx { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 15% -5%, rgba(124,92,255,.18), transparent 60%),
+      radial-gradient(55% 45% at 95% 8%, rgba(34,211,238,.13), transparent 60%),
+      radial-gradient(50% 45% at 50% 110%, rgba(244,114,182,.10), transparent 60%),
+      var(--bg); }
+  .gridlines { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(75% 65% at 50% 25%, #000 30%, transparent 100%);
+    mask-image: radial-gradient(75% 65% at 50% 25%, #000 30%, transparent 100%); }
+
+  .wrap { max-width: 1420px; margin: 0 auto; padding: 0 28px; }
+  section { scroll-margin-top: 84px; }
+
+  /* ============ 顶部导航 ============ */
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 60; transition: background .3s, box-shadow .3s, border-color .3s;
+    border-bottom: 1px solid transparent; }
+  header.scrolled { background: rgba(7,10,19,.72); backdrop-filter: blur(14px);
+    border-bottom-color: var(--line); box-shadow: 0 8px 30px rgba(0,0,0,.35); }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+  .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 18px; letter-spacing: .5px; }
+  .logo-mark { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+    background: var(--gr); color: #fff; font-size: 17px; font-weight: 900;
+    box-shadow: 0 4px 18px rgba(124,92,255,.5); }
+  .logo small { display: block; font-size: 10px; font-weight: 600; letter-spacing: 2.5px; color: var(--muted); margin-top: -3px; }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a { padding: 8px 15px; border-radius: 10px; color: var(--muted); font-size: 14px; font-weight: 600; transition: .25s; }
+  .nav-links a:hover { color: var(--txt); background: rgba(255,255,255,.06); }
+  .nav-cta { background: var(--gr); color: #fff !important; padding: 9px 18px; border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(124,92,255,.4); }
+  .nav-cta:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+  /* ============ Hero ============ */
+  .hero { padding: 190px 0 80px; text-align: center; position: relative; }
+  .hero .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--cy);
+    border: 1px solid rgba(34,211,238,.35); background: rgba(34,211,238,.08);
+    padding: 7px 16px; border-radius: 999px; letter-spacing: 1px; margin-bottom: 26px; }
+  .hero h1 { font-size: clamp(42px, 7vw, 78px); line-height: 1.12; font-weight: 900; letter-spacing: 1px; }
+  .hero h1 .grad { background: var(--gr); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { max-width: 620px; margin: 24px auto 0; color: var(--muted); font-size: 17px; }
+  .hero-btns { margin-top: 38px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 26px; border-radius: 14px;
+    font-weight: 700; font-size: 15px; border: none; transition: .25s; }
+  .btn-primary { background: var(--gr); color: #fff; box-shadow: 0 8px 26px rgba(124,92,255,.45); }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(124,92,255,.6); }
+  .btn-ghost { background: rgba(255,255,255,.05); color: var(--txt); border: 1px solid var(--line-2); }
+  .btn-ghost:hover { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.3); transform: translateY(-3px); }
+  .stats { display: flex; justify-content: center; gap: 44px; margin-top: 60px; flex-wrap: wrap; }
+  .stat b { display: block; font-size: 30px; font-weight: 900; }
+  .stat span { font-size: 13px; color: var(--muted); letter-spacing: 1px; }
+  .stat b i { font-style: normal; background: var(--gr); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* ============ 通用小节头 ============ */
+  .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 90px 0 34px; }
+  .sec-head .eyebrow { font-size: 12px; letter-spacing: 3px; font-weight: 800; color: var(--acc); text-transform: uppercase; }
+  .sec-head h2 { font-size: clamp(26px, 4vw, 38px); font-weight: 900; margin-top: 6px; }
+  .sec-head p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  /* ============ 筛选 ============ */
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; }
+  .filter { padding: 9px 20px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255,255,255,.04);
+    color: var(--muted); font-size: 14px; font-weight: 600; transition: .25s; }
+  .filter:hover { color: var(--txt); border-color: rgba(255,255,255,.3); }
+  .filter.active { color: #fff; background: var(--gr); border-color: transparent; box-shadow: 0 4px 16px rgba(124,92,255,.4); }
+
+  /* ============ 舞台 ============ */
+  .stage-card { border: 1px solid var(--line); border-radius: 22px; overflow: hidden;
+    background: linear-gradient(180deg, var(--panel), rgba(12,17,32,.6)); }
+  .stage-inner { display: grid; grid-template-columns: minmax(0, 1fr) 320px; }
+  .stage-card.collapsed .queue-zone{ display:none; }
+  .stage-card.collapsed .stage-inner{ grid-template-columns: minmax(0,1fr); }
+  .screen-zone { padding: 26px 26px 22px; }
+  .bezel { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-2);
+    background: #04060d; aspect-ratio: 16/9.6; box-shadow: inset 0 0 60px rgba(0,0,0,.6), 0 10px 34px rgba(0,0,0,.45); }
+  .bezel iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .screen-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; flex-wrap: wrap; }
+  .now-tit { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .now-tit .icon { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-weight: 900; font-size: 22px; line-height: 1; color: #fff; flex: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+  .now-tit h3 { font-size: 19px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chips { display: flex; gap: 7px; margin-top: 5px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; letter-spacing: .5px; }
+  .chip.en { background: rgba(34,211,238,.14); color: var(--cy); border: 1px solid rgba(34,211,238,.3); }
+  .chip.cn { background: rgba(244,114,182,.13); color: var(--pk); border: 1px solid rgba(244,114,182,.3); }
+  .chip.math { background: rgba(96,165,250,.15); color: #93c5fd; border: 1px solid rgba(96,165,250,.4); }
+  .chip.science { background: rgba(74,222,128,.13); color: #86efac; border: 1px solid rgba(74,222,128,.35); }
+  .chip.culture { background: rgba(251,191,36,.14); color: #fcd34d; border: 1px solid rgba(251,191,36,.4); }
+  .chip.tool { background: rgba(124,92,255,.15); color: #b6a4ff; border: 1px solid rgba(124,92,255,.35); }
+  .chip.plain { background: rgba(255,255,255,.07); color: var(--muted); border: 1px solid var(--line-2); }
+  .stage-actions { display: flex; gap: 10px; align-items: center; }
+  .icon-btn { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(255,255,255,.05);
+    border: 1px solid var(--line-2); color: var(--txt); font-size: 17px; transition: .2s; }
+  .icon-btn:hover:not(:disabled) { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
+  .icon-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .btn-play { display: inline-flex; align-items: center; gap: 8px; background: var(--gr); color: #fff; border: none;
+    padding: 10px 18px; border-radius: 12px; font-weight: 800; font-size: 14px; box-shadow: 0 6px 18px rgba(124,92,255,.45); transition: .2s; }
+  .btn-play:hover { transform: translateY(-2px); filter: brightness(1.12); }
+
+  /* 播放队列 */
+  .queue-zone { border-left: 1px solid var(--line); background: rgba(255,255,255,.02); display: flex; flex-direction: column; min-height: 0; }
+  .queue-head { padding: 22px 20px 12px; font-size: 12px; letter-spacing: 2.5px; font-weight: 800; color: var(--muted); }
+  .queue-list { list-style: none; overflow-y: auto; padding: 0 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .queue-list::-webkit-scrollbar { width: 6px; }
+  .queue-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.14); border-radius: 99px; }
+  .queue-item { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; background: none; border: 1px solid transparent;
+    padding: 9px; border-radius: 13px; transition: .22s; }
+  .queue-item:hover { background: rgba(255,255,255,.05); }
+  .queue-item.active { background: rgba(124,92,255,.13); border-color: rgba(124,92,255,.4); }
+  .queue-thumb { width: 66px; height: 46px; border-radius: 9px; flex: none; display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 21px; line-height: 1;
+    box-shadow: 0 3px 10px rgba(0,0,0,.3); }
+  .queue-meta { min-width: 0; }
+  .queue-meta b { display: block; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .queue-meta span { font-size: 11px; color: var(--muted); }
+  .queue-num { margin-left: auto; font-size: 11px; color: #5c6b86; font-weight: 800; padding-left: 8px; }
+  .queue-item.active .queue-num { color: #b6a4ff; }
+
+  /* ============ 作品墙 ============ */
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 22px; }
+  .gcard { position: relative; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: var(--panel);
+    transition: transform .3s, box-shadow .3s, border-color .3s; text-align: left; width: 100%; }
+  .gcard:hover { transform: translateY(-6px); border-color: rgba(255,255,255,.25); box-shadow: 0 18px 40px rgba(0,0,0,.5); }
+  .gcard .cover { position: relative; aspect-ratio: 16/9; display: grid; place-items: center; overflow: hidden; }
+  .gcard .cover .mark { width: 80px; height: 80px; border-radius: 22px; background: rgba(255,255,255,.16); backdrop-filter: blur(3px);
+    display: grid; place-items: center; color: #fff; font-size: 40px; font-weight: 900; line-height: 1; box-shadow: 0 8px 26px rgba(0,0,0,.35);
+    transform: rotate(-6deg); transition: .3s; border: 1px solid rgba(255,255,255,.35); }
+  .gcard:hover .cover .mark { transform: rotate(0deg) scale(1.08); }
+  .gcard .cover .c-cat { position: absolute; top: 12px; left: 12px; }
+  .gcard .cover .c-play { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; border-radius: 50%;
+    background: rgba(0,0,0,.4); backdrop-filter: blur(4px); display: grid; place-items: center; color: #fff; font-size: 14px; opacity: 0; transform: translateY(6px); transition: .3s;
+    border: 1px solid rgba(255,255,255,.3); }
+  .gcard:hover .c-play { opacity: 1; transform: translateY(0); }
+  .gcard .c-body { padding: 16px 18px 18px; }
+  .gcard .c-body h4 { font-size: 16px; font-weight: 800; }
+  .gcard .c-body p { font-size: 13px; color: var(--muted); margin-top: 7px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 41px; }
+  .gcard .c-tags { display: flex; gap: 6px; margin-top: 13px; }
+  .gcard.active { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc), 0 14px 34px rgba(124,92,255,.22); }
+  .gcard.empty { grid-column: 1 / -1; padding: 46px; text-align: center; color: var(--muted); border-style: dashed; }
+
+  /* ============ 关于 ============ */
+  .about { display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center; padding: 70px 0 40px; }
+  .about h2 { font-size: clamp(26px, 4vw, 36px); font-weight: 900; line-height: 1.3; }
+  .about h2 .grad { background: var(--gr); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .about p { color: var(--muted); margin-top: 18px; font-size: 15px; }
+  .about .points { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+  .about .points li { list-style: none; display: flex; gap: 12px; align-items: flex-start; color: var(--txt); font-size: 14.5px; }
+  .about .points .dot { width: 26px; height: 26px; border-radius: 9px; background: rgba(124,92,255,.18); color: #b6a4ff;
+    display: grid; place-items: center; flex: none; font-size: 12px; font-weight: 900; }
+  .side-card { border: 1px solid var(--line); border-radius: 22px; padding: 30px; background: linear-gradient(180deg, rgba(124,92,255,.1), transparent 55%),
+    var(--panel); }
+  .side-card .lbl { font-size: 12px; letter-spacing: 2px; color: var(--muted); font-weight: 800; }
+  .side-card .big { font-size: 44px; font-weight: 900; margin-top: 8px; }
+  .side-card .big small { font-size: 18px; color: var(--muted); font-weight: 700; }
+  .side-list { margin-top: 18px; display: flex; flex-direction: column; gap: 11px; }
+  .side-list .row { display: flex; justify-content: space-between; font-size: 14px; padding-bottom: 11px; border-bottom: 1px dashed var(--line); }
+  .side-list .row span { color: var(--muted); }
+  .side-list .row b { font-weight: 700; }
+  .side-list .row b i { font-style: normal; color: var(--cy); }
+
+  /* ============ Footer ============ */
+  footer { border-top: 1px solid var(--line); margin-top: 90px; padding: 34px 0; color: var(--muted); font-size: 13.5px; }
+  .foot-in { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .foot-in b { color: var(--txt); }
+  .foot-in .logo { font-size: 15px; }
+
+  /* ============ 全屏 Modal ============ */
+  .modal { position: fixed; inset: 0; z-index: 100; background: rgba(3,5,10,.92); backdrop-filter: blur(8px);
+    display: none; flex-direction: column; }
+  .modal.open { display: flex; }
+  .modal-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--line); background: rgba(7,10,19,.85); }
+  .modal-top .m-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .modal-top .m-name .icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 20px; line-height: 1; }
+  .modal-top .m-name b { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .modal-top .m-tools { display: flex; gap: 8px; }
+  .m-close { width: 40px; height: 40px; border-radius: 11px; border: 1px solid var(--line-2); background: rgba(255,255,255,.05); color: var(--txt); font-size: 16px; transition: .2s; }
+  .m-close:hover { background: rgba(244,80,80,.2); border-color: rgba(244,80,80,.5); color: #fff; }
+  .modal iframe { flex: 1; border: 0; background: #fff; }
+  .modal-bar { position: fixed; top: 50%; transform: translateY(-50%); z-index: 105; width: 52px; height: 64px; border-radius: 14px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 24px; display: grid; place-items: center; transition: .2s; }
+  .modal-bar:hover { background: var(--acc); border-color: var(--acc); }
+  .modal-bar.prev { left: 16px; } .modal-bar.next { right: 16px; }
+  @media (max-width: 820px) { .modal-bar { display: none; } }
+
+  /* ============ 响应式 ============ */
+  @media (max-width: 980px) {
+    .stage-inner { grid-template-columns: 1fr; }
+    .queue-zone { border-left: 0; border-top: 1px solid var(--line); }
+    .queue-list { flex-direction: row; overflow-x: auto; padding: 0 14px 14px; }
+    .queue-item { flex: none; width: 230px; }
+    .about { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hero { padding-top: 150px; }
+    .screen-zone { padding: 16px; }
+    .stage-actions .btn-play { padding: 9px 14px; font-size: 13px; }
+    .bezel { aspect-ratio: 4/4.4; }
+  }
+
+  /* ============ 轻松 BGM 播放器 ============ */
+  .bgm-bar { position: fixed; right: 16px; bottom: 16px; z-index: 500; display: flex; align-items: center; gap: 7px;
+    padding: 6px 12px; background: rgba(10,14,28,.78); border: 1px solid rgba(255,255,255,.16); border-radius: 99px;
+    backdrop-filter: blur(12px); box-shadow: 0 12px 34px rgba(0,0,0,.45); }
+  .bgm-bar button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.09);
+    color: #fff; font-size: 14px; line-height: 1; display: grid; place-items: center; transition: .2s; }
+  .bgm-bar button:hover { background: rgba(124,92,255,.7); transform: scale(1.06); }
+  .bgm-name { font-size: 12px; color: #cdd7e8; max-width: 116px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bgm-vol { width: 92px; height: 4px; accent-color: #8b5cf6; cursor: pointer; }
+  @media (max-width: 640px) {
+    .bgm-bar { right: 10px; bottom: 10px; padding: 5px 9px; }
+    .bgm-name { max-width: 78px; }
+    .bgm-vol { width: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bgfx"></div>
+<div class="gridlines"></div>
+
+<!-- 顶部导航 -->
+<header id="topbar">
+  <div class="wrap nav">
+    <a class="logo" href="#top">
+      <span class="logo-mark">趣</span>
+      <span>趣学工坊<small>PLAY · LEARN · TEACH</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#showcase">作品展厅</a>
+      <a href="#library">全部作品</a>
+      <a href="#about">关于工坊</a>
+      <a class="nav-cta" href="#showcase">进入展厅</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <span class="kicker">◆ 互动教学作品展厅 v2.2</span>
+    <h1>把知识，<span class="grad">做成游戏</span></h1>
+    <p class="sub">这里是「趣学工坊」—— 一个老师的互动课件实验室。每个作品都源于真实课堂：点击即玩、即开即用，覆盖语文、英语、数学、科学、文史多学科，让知识点在玩的过程中自然记住。</p>
+    <div class="hero-btns">
+      <a class="btn btn-primary" href="#showcase">▶&nbsp; 开始体验</a>
+      <a class="btn btn-ghost" href="#library">浏览全部作品</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b><i>15</i></b><span>在展作品</span></div>
+      <div class="stat"><b><i>07</i></b><span>学科覆盖</span></div>
+      <div class="stat"><b>即开</b><span>即玩的网页</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 舞台展厅 -->
+<section id="showcase">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">SHOWCASE</div>
+        <h2>作品展厅</h2>
+        <p>点选下方作品，在主屏幕直接体验；支持 ← → 快速切换。</p>
+      </div>
+    </div>
+
+    <div class="filters" id="catFilters"></div>
+
+    <div class="stage-card">
+      <div class="stage-inner">
+        <!-- 屏幕区 -->
+        <div class="screen-zone">
+          <div class="bezel">
+            <iframe id="stageFrame" title="作品预览" allowfullscreen></iframe>
+          </div>
+          <div class="screen-foot">
+            <div class="now-tit">
+              <div class="icon" id="nowIcon">连</div>
+              <div>
+                <h3 id="nowTitle">—</h3>
+                <div class="chips">
+                  <span class="chip" id="nowCat">—</span>
+                  <span class="chip plain" id="nowTag">—</span>
+                </div>
+              </div>
+            </div>
+            <div class="stage-actions">
+              <button class="icon-btn" id="btnQueue" title="收起 / 展开播放队列">▤</button>
+              <button class="icon-btn" id="btnPrev" title="上一个作品">‹</button>
+              <button class="btn-play" id="btnFull">⛶&nbsp; 全屏游玩</button>
+              <button class="icon-btn" id="btnNext" title="下一个作品">›</button>
+            </div>
+          </div>
+        </div>
+        <!-- 播放队列 -->
+        <div class="queue-zone">
+          <div class="queue-head">播放队列 · QUEUE</div>
+          <ul class="queue-list" id="queueList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 全部作品墙 -->
+<section id="library">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">GAME LIBRARY</div>
+        <h2>全部作品</h2>
+        <p>点击任意卡片，即可把它加载到展厅主屏幕。</p>
+      </div>
+    </div>
+    <div class="gallery" id="gallery"></div>
+  </div>
+</section>
+
+<!-- 关于 -->
+<section id="about">
+  <div class="wrap about">
+    <div>
+      <div class="eyebrow">ABOUT STUDIO</div>
+      <h2>从课堂上长出来的 <span class="grad">小游戏</span></h2>
+      <p>这些作品没有复杂引擎，只用纯网页技术实现，为的是让每位老师都能「拿过去就能用、就能改」。让枯燥的背诵变成闯关，让零散的考点连成线索。</p>
+      <ul class="points">
+        <li><span class="dot">✓</span>纯静态网页，无需安装、打开即玩，可离线拷入教室设备</li>
+        <li><span class="dot">✓</span>面向课堂设计的轻交互：即时反馈、闯关、星级与连击激励</li>
+        <li><span class="dot">✓</span>持续更新中 —— 下一个作品可能就是为你定制</li>
+      </ul>
+    </div>
+    <div class="side-card">
+      <div class="lbl">LIVE PROJECTS</div>
+      <div class="big">15<small> / 个在展作品</small></div>
+      <div class="side-list">
+        <div class="row"><span>语文学科</span><b><i>4</i></b></div>
+        <div class="row"><span>英语学科</span><b><i>3</i></b></div>
+        <div class="row"><span>数学学科</span><b><i>2</i></b></div>
+        <div class="row"><span>科学探索（化·生）</span><b><i>2</i></b></div>
+        <div class="row"><span>史地人文</span><b><i>2</i></b></div>
+        <div class="row"><span>写作 & 工具</span><b><i>2</i></b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap foot-in">
+    <a class="logo" href="#top"><span class="logo-mark" style="width:30px;height:30px;font-size:13px;border-radius:9px;">趣</span><b>趣学工坊</b></a>
+    <span>互动教学作品展厅 · 让学习像游戏一样上瘾</span>
+  </div>
+</footer>
+
+<!-- 全屏播放 -->
+<div class="modal" id="modal">
+  <div class="modal-top">
+    <div class="m-name">
+      <div class="icon" id="mIcon">连</div>
+      <b id="mTitle">—</b>
+    </div>
+    <div class="m-tools">
+      <button class="m-close" id="btnClose" title="退出全屏 (Esc)">✕</button>
+    </div>
+  </div>
+  <iframe id="modalFrame" title="全屏作品" allowfullscreen></iframe>
+</div>
+
+<script>
+/* ================= 作品数据 =================
+   想新增作品？复制一行并改：id / title / cat / tag / desc / file / badge / c1 / c2。
+   cat 可用：en 英语、cn 语文、math 数学、science 科学、culture 史地人文、tool 工具。 */
+const GAMES = [
+  /* —— 英语学习 —— */
+  { id:"phraselink", title:"初中英语作文词汇连连看", cat:"en", tag:"词组配对 · 连连看",
+    desc:"把初中英语作文高频词组与中文释义配对连线，闯关式巩固写作词汇，让地道表达信手拈来。",
+    file:"教学小游戏/初中英语作文词汇连连看.html", badge:"🧩", c1:"#7c3aed", c2:"#2e1065" },
+  { id:"verbs", title:"初中不规则动词背诵", cat:"en", tag:"动词记忆 · 闯关",
+    desc:"常见不规则动词三态翻转记忆，带进度追踪与自我检测，把最头疼的背诵变成每日小游戏。",
+    file:"教学小游戏/irregular_verbs (1).html", badge:"🔄", c1:"#f97316", c2:"#7c2d12" },
+  { id:"listen", title:"英语单词听写训练", cat:"en", tag:"听力听写 · 跟读",
+    desc:"系统用标准语音朗读单词，你听音拼写、即时判分，分小学 / 初中词表，锻炼耳朵和拼写双技能。",
+    file:"教学小游戏/英语单词听写训练.html", badge:"🎧", c1:"#0f766e", c2:"#022c22" },
+  /* —— 语文学科 —— */
+  { id:"chengyu", title:"成语填空大闯关", cat:"cn", tag:"成语闯关 · 释义",
+    desc:"成语缺了一个字？四选一补全，答对连击加分，错题附释义，一局十题让你把成语记得牢牢的。",
+    file:"教学小游戏/成语填空大闯关.html", badge:"📖", c1:"#db2777", c2:"#500724" },
+  { id:"poemfill", title:"古诗词名句填空", cat:"cn", tag:"诗句补全 · 名篇",
+    desc:"补全课本常考古诗句，答后即见出处与作者，积少成多，争做诗词小达人。",
+    file:"教学小游戏/古诗词名句填空.html", badge:"📜", c1:"#a6362c", c2:"#4d1411" },
+  { id:"phonetics", title:"现代汉语语音考点记忆游戏", cat:"cn", tag:"汉语考点 · 卡片",
+    desc:"把现代汉语语音考点做成问答卡片，声母、韵母、声调与拼写规则边翻边记，适合备考复习。",
+    file:"教学小游戏/现代汉语语音.html", badge:"🔊", c1:"#06b6d4", c2:"#164e63" },
+  { id:"pinyin", title:"汉字拼音翻翻乐", cat:"cn", tag:"拼音认读 · 翻牌",
+    desc:"经典翻翻乐玩法：翻出汉字并匹配正确拼音，眼、手、口并用，轻松拿下生字读音。",
+    file:"教学小游戏/卡牌游戏2.html", badge:"🎴", c1:"#ec4899", c2:"#831843" },
+  /* —— 数学思维 —— */
+  { id:"arith", title:"数学口算极速挑战", cat:"math", tag:"限时速算 · 连击",
+    desc:"60 秒限时口算，加减乘除自选难度，答对连击加分，挑战全班的最高分纪录！",
+    file:"教学小游戏/数学口算极速挑战.html", badge:"🧮", c1:"#3b82f6", c2:"#172554" },
+  { id:"game24", title:"24 点速算挑战", cat:"math", tag:"心算24 · 运算符",
+    desc:"四个数字用 ＋－×÷ 凑出 24，三种难度自动出题、即判即对，课堂上练心算的绝佳热身。",
+    file:"教学小游戏/24点速算挑战.html", badge:"🃏", c1:"#1d4ed8", c2:"#0c1738" },
+  /* —— 科学探索 —— */
+  { id:"elements", title:"化学元素翻翻乐", cat:"science", tag:"记忆翻牌 · 元素",
+    desc:"把前 10 号元素的中文名与符号做成翻牌游戏，比一比谁是元素记忆大师。",
+    file:"教学小游戏/化学元素翻翻乐.html", badge:"⚗️", c1:"#2dd4bf", c2:"#134e4a" },
+  { id:"cell", title:"生物细胞结构知识配对", cat:"science", tag:"两两配对 · 细胞",
+    desc:"细胞壁、线粒体、叶绿体……将结构与功能一一配对，把细胞这台精密小工厂摸清楚。",
+    file:"教学小游戏/生物细胞知识配对.html", badge:"🧬", c1:"#4ade80", c2:"#14532d" },
+  /* —— 史地人文 —— */
+  { id:"history", title:"中国历史时间线", cat:"culture", tag:"排序闯关 · 时间线",
+    desc:"从夏商西周到新中国成立，按时间顺序排出朝代与大事，闯关中秒懂中国历史脉络。",
+    file:"教学小游戏/中国历史时间线.html", badge:"🏯", c1:"#f59e0b", c2:"#713f12" },
+  { id:"geo", title:"省份 · 省会大挑战", cat:"culture", tag:"抢答闯关 · 地理",
+    desc:"28 个省和自治区与其行政中心随机考问，可自选方向与题量，出门旅游再也不迷路。",
+    file:"教学小游戏/地理省份省会挑战.html", badge:"🗺️", c1:"#84cc16", c2:"#3f6212" },
+  /* —— 教学工具 —— */
+  { id:"writing", title:"文笔对比分析工具", cat:"tool", tag:"写作分析 · 可视化",
+    desc:"同时粘贴两段文字，智能对比词汇丰富度、句式节奏与文采风格，让修改方向一目了然。",
+    file:"教学小游戏/writing_comparison_tool.html", badge:"✍️", c1:"#6366f1", c2:"#312e81" },
+  { id:"hsk", title:"HSK 文本分析工具（网页版）", cat:"tool", tag:"词频分析 · 双文本对比",
+    desc:"按 HSK 1-6 级词表自动标注文章：统计高频词与等级分布，支持饼图 / 柱状图、双文本对比与导出，帮老师快速看懂学生作文的词汇水平。",
+    file:"教学小游戏/HSK文本分析工具/HSK文本分析工具.html", badge:"📊", c1:"#0d9488", c2:"#042f2e" }
+];
+
+/* 学科分类展示配置：新增学科只需在这里加一项（filters 会自动生成），icon 为该学科的独立图标 */
+const CATS = [
+  { key:"all",    label:"全部",      icon:"" },
+  { key:"cn",     label:"语文学习",  icon:"📖", cls:"cn" },
+  { key:"en",     label:"英语学习",  icon:"🔤", cls:"en" },
+  { key:"math",   label:"数学思维",  icon:"🧮", cls:"math" },
+  { key:"science",label:"科学探索",  icon:"🔬", cls:"science" },
+  { key:"culture",label:"史地人文",  icon:"🌍", cls:"culture" },
+  { key:"tool",   label:"教学工具",  icon:"🛠️", cls:"tool" }
+];
+const CAT_MAP = {}; CATS.forEach(c=>CAT_MAP[c.key]=c);
+
+/* ============ 状态 ============ */
+let list = [];            // 当前分类下可见作品（按 GAMES 顺序）
+let curId = GAMES[0].id;  // 当前正在展示的作品 id
+let activeCat = "all";
+
+const $ = id => document.getElementById(id);
+const enc = u => u.split("/").map(s=>encodeURIComponent(s)).join("/");
+const grad = g => "linear-gradient(135deg, " + g.c1 + ", " + g.c2 + ")";
+const currentGame = () => list.find(g => g.id === curId) || list[0];
+
+/* ============ 分类筛选（自动生成按钮） ============ */
+$("catFilters").innerHTML = CATS.map(c=>`<button class="filter" data-cat="${c.key}">${c.icon ? c.icon+"&nbsp;" : ""}${c.label}</button>`).join("");
+document.querySelectorAll("#catFilters .filter").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#catFilters .filter").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    activeCat = btn.dataset.cat;
+    list = activeCat === "all" ? GAMES.slice() : GAMES.filter(g => g.cat === activeCat);
+    if (!list.some(g => g.id === curId)) curId = list.length ? list[0].id : "";
+    renderQueue(); renderGallery(); paint();
+    const r = $("showcase").getBoundingClientRect();
+    if (r.top < 60) $("showcase").scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+});
+
+/* ============ 渲染：播放队列 ============ */
+function renderQueue() {
+  $("queueList").innerHTML = list.map((g, i) => {
+    const meta = CAT_MAP[g.cat] || CAT_MAP.tool;
+    return `<li>
+      <button class="queue-item" data-id="${g.id}">
+        <span class="queue-thumb" style="background:${grad(g)}">${g.badge}</span>
+        <span class="queue-meta"><b>${g.title}</b><span>${meta.icon ? meta.icon+" " : ""}${meta.label}</span></span>
+        <span class="queue-num">${String(i+1).padStart(2,"0")}</span>
+      </button>
+    </li>`;
+  }).join("");
+  document.querySelectorAll(".queue-item").forEach(el => {
+    el.addEventListener("click", () => { curId = el.dataset.id; paint(); });
+  });
+}
+
+/* ============ 渲染：作品墙 ============ */
+function renderGallery() {
+  $("gallery").innerHTML = list.map(g => {
+    const meta = CAT_MAP[g.cat] || CAT_MAP.tool;
+    return `<button class="gcard" data-id="${g.id}">
+      <span class="cover" style="background:
+          radial-gradient(120% 130% at 85% 8%, rgba(255,255,255,.28), transparent 46%),
+          linear-gradient(140deg, ${g.c1}, ${g.c2})">
+        <span class="mark">${g.badge}</span>
+        <span class="chip ${meta.cls} c-cat">${meta.icon ? meta.icon+" " : ""}${meta.label}</span>
+        <span class="c-play">▶</span>
+      </span>
+      <span class="c-body">
+        <h4>${g.title}</h4>
+        <p>${g.desc}</p>
+        <span class="c-tags"><span class="chip plain">${g.tag}</span></span>
+      </span>
+    </button>`;
+  }).join("") || `<div class="gcard empty">该分类下暂无作品，敬请期待。</div>`;
+  document.querySelectorAll(".gcard").forEach(el => {
+    el.addEventListener("click", () => {
+      curId = el.dataset.id; paint();
+      $("showcase").scrollIntoView({ behavior:"smooth", block:"start" });
+    });
+  });
+  syncAllActive();
+}
+
+/* ============ 主舞台刷新 ============ */
+function paint() {
+  const g = currentGame(); if (!g) return;
+  $("stageFrame").src = enc(g.file);
+  $("nowTitle").textContent = g.title;
+  $("nowIcon").textContent = g.badge;
+  $("nowIcon").style.background = grad(g);
+  const meta = CAT_MAP[g.cat] || CAT_MAP.tool;
+  $("nowCat").textContent = (meta.icon ? meta.icon+" " : "") + meta.label;
+  $("nowCat").className = "chip " + (meta.cls || "tool");
+  $("nowTag").textContent = g.tag;
+  const idx = list.indexOf(g);
+  $("btnPrev").disabled = idx <= 0;
+  $("btnNext").disabled = idx >= list.length - 1;
+  // 全屏弹窗同步
+  $("mIcon").textContent = g.badge;
+  $("mIcon").style.background = grad(g);
+  $("mTitle").textContent = g.title;
+  syncAllActive();
+}
+function syncAllActive() {
+  const g = currentGame(); if (!g) return;
+  document.querySelectorAll(".queue-item").forEach(el => el.classList.toggle("active", el.dataset.id === g.id));
+  document.querySelectorAll(".gcard").forEach(el => el.classList.toggle("active", el.dataset.id === g.id));
+}
+
+/* ============ 上 / 下一个 ============ */
+function goPrev(){ const i = list.findIndex(g=>g.id===curId); if (i>0){ curId=list[i-1].id; paint(); } }
+function goNext(){ const i = list.findIndex(g=>g.id===curId); if (i>=0 && i<list.length-1){ curId=list[i+1].id; paint(); } }
+$("btnPrev").addEventListener("click", goPrev);
+$("btnNext").addEventListener("click", goNext);
+/* 收起/展开右侧播放队列，让主舞台预览占满全宽 */
+$("btnQueue").addEventListener("click", ()=>{
+  const card = document.querySelector(".stage-card");
+  card.classList.toggle("collapsed");
+  $("btnQueue").textContent = card.classList.contains("collapsed") ? "▣" : "▤";
+  $("btnQueue").title = card.classList.contains("collapsed") ? "展开播放队列" : "收起播放队列";
+});
+
+/* ============ 全屏播放 ============ */
+const modal = $("modal");
+function openModal(){ const g=currentGame(); if(!g)return; $("modalFrame").src=enc(g.file); modal.classList.add("open"); document.body.style.overflow="hidden"; }
+function closeModal(){ modal.classList.remove("open"); document.body.style.overflow=""; $("modalFrame").src=""; }
+$("btnFull").addEventListener("click", openModal);
+$("btnClose").addEventListener("click", closeModal);
+modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeModal();
+  if (e.key === "ArrowLeft") goPrev();
+  if (e.key === "ArrowRight") goNext();
+});
+
+/* ============ 导航滚动阴影 ============ */
+const bar = $("topbar");
+addEventListener("scroll", () => bar.classList.toggle("scrolled", scrollY > 20), { passive:true });
+
+/* ============ 初始化 ============ */
+list = GAMES.slice();
+document.querySelectorAll("#catFilters .filter").forEach(b=>b.classList.toggle("active", b.dataset.cat==="all"));
+renderQueue();
+renderGallery();
+paint();
+</script>
+
+<!-- 轻松 BGM 播放器（纯 Web Audio 合成，无音频文件） -->
+<div class="bgm-bar" title="展厅轻松 BGM">
+  <button id="bgmToggle" title="播放背景音乐">▶</button>
+  <button id="bgmNext" title="换一首">↻</button>
+  <span class="bgm-name" id="bgmName">🎵 星河漫步</span>
+  <input class="bgm-vol" id="bgmVol" type="range" min="0" max="100" step="1" value="45" title="音乐音量">
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var AC=window.AudioContext||window.webkitAudioContext;
+  var ctx=null,master=null,timer=null,playing=false,step=0,nextT=0;
+  var vol=.45,ti=0,on=true;
+  var TRACKS=[
+    {name:"星河漫步", bpm:70, ch:[[60,64,67],[57,60,64],[65,69,72],[53,57,60]], ar:[0,1,2,3,2,1,0,2], hl:true},
+    {name:"海风轻拂", bpm:58, ch:[[57,60,64],[53,57,60],[60,64,67],[55,59,62]], ar:[2,0,1,2,1,0,2,1], hl:false},
+    {name:"晨光钢琴", bpm:74, ch:[[60,64,67],[62,65,69],[65,69,72],[67,71,74]], ar:[0,1,2,1,0,1,2,3], hl:true},
+    {name:"萤火之森", bpm:80, ch:[[64,67,71],[62,65,69],[60,64,67],[65,69,72]], ar:[2,1,0,1,2,1,0,1], hl:true}
+  ];
+  function save(){ try{ localStorage.setItem("bgmState", JSON.stringify({on:on,ti:ti,vol:Math.round(vol*100)})); }catch(e){} }
+  function load(){ try{ var s=localStorage.getItem("bgmState"); if(s){ var o=JSON.parse(s); on=o.on!==false; ti=o.ti||0; vol=(o.vol==null?45:o.vol)/100; } }catch(e){} }
+  function ac(){ if(!ctx){ if(!AC) return null; try{ ctx=new AC(); master=ctx.createGain(); master.gain.value=vol; master.connect(ctx.destination); }catch(e){ return null; } }
+    if(ctx.state==="suspended") ctx.resume(); return ctx; }
+  function note(midi,t,d,ty,v){ if(!ctx) return; var o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=ty; o.frequency.value=440*Math.pow(2,(midi-69)/12);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(v||.05,t+.02); g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+d+.05); }
+  function spb(){ return 60/TRACKS[ti].bpm/2; }
+  function sched(s,t){ var tr=TRACKS[ti], bar=Math.floor(s/8), chord=tr.ch[bar%tr.ch.length], seq=s%8, a=tr.ar[seq];
+    if(seq===0) note(chord[0]-12,t,1.1,"sine",.085);
+    note(chord[a],t,.5,"triangle",.05);
+    if(tr.hl && (seq===2||seq===6)) note(chord[2]+12,t,.6,"sine",.022);
+  }
+  function tick(){ if(!ctx) return; while(nextT < ctx.currentTime + .3){ sched(step,nextT); nextT+=spb(); step=(step+1)%1024; } }
+  function start(){ if(!ac()) return; if(!timer) timer=setInterval(tick,90); step=0; nextT=ctx.currentTime+.06; playing=true; ui(); }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; } playing=false; ui(); }
+  var bToggle=$("bgmToggle"), bNext=$("bgmNext"), bName=$("bgmName"), bVol=$("bgmVol");
+  function ui(){ bToggle.textContent= playing? "⏸" : "▶"; bName.textContent="🎵 "+TRACKS[ti].name;
+    bToggle.title= playing? "暂停背景音乐" : "播放背景音乐"; }
+  function pick(i){ ti=(i+TRACKS.length)%TRACKS.length; ui(); save(); }
+  bToggle.onclick=function(){ if(playing){ on=false; stop(); } else { on=true; if(ac()) start(); } save(); };
+  bNext.onclick=function(){ pick(ti+1); if(on && ctx) start(); save(); };
+  bVol.addEventListener("input",function(){ vol=bVol.value/100; if(master) master.gain.value=vol; save(); });
+  load(); bVol.value=Math.round(vol*100); if(master) master.gain.value=vol; ui();
+  var unlocked=false;
+  document.addEventListener("pointerdown",function(e){
+    var c=ac();
+    var inBar = e.target && e.target.closest && e.target.closest(".bgm-bar");
+    if(!unlocked){ unlocked=true; if(on && !playing && !inBar){ start(); } }
+    var t=e.target;
+    if(t && t.closest && !inBar && t.closest("button,a,.gcard,.queue-item,.filter,.queue-thumb")){
+      if(ctx) note(620,ctx.currentTime,.05,"triangle",.026);
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

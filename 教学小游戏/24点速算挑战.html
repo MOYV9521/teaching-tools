@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24 点速算挑战 · 含音效</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; color:#fff;
+    background:radial-gradient(1000px 600px at 90% -10%, #1d4ed8, transparent),
+               radial-gradient(900px 700px at -10% 110%, #0891b2, transparent),
+               linear-gradient(160deg,#0b1220,#0f1e3d 55%,#0a2a33); }
+  .wrap { width:min(780px,100%); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:22px;
+    padding:22px; backdrop-filter:blur(8px); box-shadow:0 30px 80px rgba(0,0,0,.45); }
+  header { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  header h1 { font-size:20px; letter-spacing:1px; }
+  header h1 span { font-size:13px; color:#67e8f9; margin-left:8px; font-weight:400; }
+  .hud { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+  .pill { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); padding:6px 12px; border-radius:99px; font-size:13px; }
+  .pill b { color:#fbbf24; }
+  .bar { height:8px; border-radius:99px; background:rgba(255,255,255,.12); overflow:hidden; margin-bottom:22px; }
+  .bar i { display:block; height:100%; width:0%; background:linear-gradient(90deg,#22d3ee,#3b82f6); transition:width .5s; border-radius:99px; }
+  .nums { display:flex; justify-content:center; gap:16px; margin:6px 0 26px; flex-wrap:wrap; }
+  .num { width:78px; height:100px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:46px; font-weight:900;
+    color:#fff; text-shadow:0 2px 10px rgba(0,0,0,.4); box-shadow:0 14px 30px rgba(0,0,0,.35); animation:pop .3s; }
+  @keyframes pop { from{ transform:scale(.7); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .eq { display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; font-size:24px; font-weight:800; letter-spacing:1px; }
+  .eq .slot { width:66px; padding:8px 4px; border-radius:12px; text-align:center; font-size:22px; font-weight:900; color:#0f172a;
+    background:linear-gradient(160deg,#fef9c3,#fde047); border:2px solid #f59e0b; cursor:pointer; outline:none; }
+  .eq .grp { color:#93c5fd; font-weight:400; }
+  .eq .val { font-size:30px; color:#fbbf24; min-width:56px; text-align:center; }
+  .badges { display:flex; justify-content:center; gap:18px; margin:20px 0 14px; font-size:13px; color:#bae6fd; flex-wrap:wrap; }
+  .steps { min-height:52px; display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; font-size:14px; color:#e2e8f0; line-height:1.8;
+    background:rgba(255,255,255,.05); border:1px dashed rgba(255,255,255,.15); border-radius:12px; padding:10px 14px; }
+  .steps .ok { color:#34d399; }
+  .steps .bad { color:#fca5a5; }
+  .btns { display:flex; justify-content:center; gap:12px; margin-top:18px; flex-wrap:wrap; }
+  .btn { padding:11px 26px; border-radius:12px; border:0; font-size:15px; font-weight:700; cursor:pointer; color:#fff; }
+  .btn.main { background:linear-gradient(90deg,#06b6d4,#2563eb); }
+  .btn.ghost { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); }
+  .btn:hover { filter:brightness(1.12); }
+  footer { margin-top:16px; color:rgba(255,255,255,.5); font-size:12px; text-align:center; }
+  .ov { position:fixed; inset:0; background:rgba(6,10,22,.82); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:20; padding:20px; text-align:center; }
+  .ov h2 { font-size:30px; margin-bottom:10px; }
+  .ov p { color:#cbd5e1; line-height:2; margin-bottom:16px; }
+  .lvl { display:flex; gap:12px; justify-content:center; margin:8px 0 22px; flex-wrap:wrap; }
+  .lvl button { padding:13px 22px; border-radius:14px; border:2px solid rgba(255,255,255,.2); background:rgba(255,255,255,.07); color:#fff; font-size:15px; cursor:pointer; font-weight:700; }
+  .lvl button:hover, .lvl button.on { background:#2563eb; border-color:#60a5fa; transform:translateY(-2px); }
+  .bigbtn { padding:14px 46px; font-size:18px; border-radius:14px; border:0; cursor:pointer; font-weight:800; color:#fff;
+    background:linear-gradient(90deg,#06b6d4,#2563eb); box-shadow:0 12px 30px rgba(37,99,235,.4); }
+  .bigbtn:hover { filter:brightness(1.12); }
+  .statline { font-size:15px; color:#e2e8f0; margin-bottom:6px; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>24 点速算挑战<span>🎴 心算 24 · 含音效</span></h1>
+    <div class="hud">
+      <div class="pill">🧩 第 <b id="cur">1</b>/8</div>
+      <div class="pill">🔥 连对 <b id="streak">0</b></div>
+      <div class="pill">🏆 得分 <b id="score">0</b></div>
+      <div class="pill">🥇 最佳 <b id="best">0</b></div>
+    </div>
+  </header>
+  <div class="bar"><i id="barI"></i></div>
+
+  <div class="nums" id="numBox"></div>
+
+  <div class="eq">
+    <span class="grp">( (</span>
+    <b id="n0"></b>
+    <select class="slot" id="o1"><option value="+">＋</option><option value="-">－</option><option value="*">×</option><option value="/">÷</option></select>
+    <b id="n1"></b>
+    <span class="grp">)</span>
+    <select class="slot" id="o2"><option value="+">＋</option><option value="-">－</option><option value="*">×</option><option value="/">÷</option></select>
+    <b id="n2"></b>
+    <span class="grp">)</span>
+    <select class="slot" id="o3"><option value="+">＋</option><option value="-">－</option><option value="*">×</option><option value="/">÷</option></select>
+    <b id="n3"></b>
+    <span class="grp">=</span><span class="val" id="live">?</span>
+  </div>
+
+  <div class="badges">四个数字各用一次 · 选择 + － × ÷ 使结果为 <b style="color:#fbbf24">24</b>，按从左到右的括号顺序计算</div>
+  <div class="steps" id="steps">👇 摆好算式后点「验证」，看看你得几分！</div>
+
+  <div class="btns">
+    <button class="btn main" id="btnCheck">✅ 验证</button>
+    <button class="btn ghost" id="btnSkip">⏭ 换一题（跳过）</button>
+  </div>
+  <footer>每一局 8 题 · 心算大师请接招！</footer>
+</div>
+
+<div class="ov" id="ovStart">
+  <h2>🎴 24 点速算挑战</h2>
+  <p>系统给出 4 个数字，你在中间填上 <b>＋ － × ÷</b>，<br>让整式的结果等于 <b>24</b>（数字各用一次，从左到右计算）。</p>
+  <div class="lvl" id="lvlBox">
+    <button data-d="e">😌 简单</button>
+    <button data-d="m">🙂 中等</button>
+    <button data-d="h">🤯 困难</button>
+  </div>
+  <button class="bigbtn" id="btnStart">开 始 挑 战</button>
+</div>
+<div class="ov hidden" id="ovEnd">
+  <div class="statline" style="font-size:40px;margin:6px 0" id="rankEmoji">🏆</div>
+  <h2 id="rankTitle">本局完成！</h2>
+  <div class="statline">得分：<b style="color:#fbbf24" id="fScore">0</b>　·　解出 <b id="fRight">0</b> / 8　·　最长连对 <b id="fStreak">0</b></div>
+  <div class="statline">历史最佳：<b id="fBest">0</b> 分</div>
+  <p id="rankNote"></p>
+  <button class="bigbtn" id="btnAgain">🔁 再来一局</button>
+</div>
+
+<script>
+var AC = window.AudioContext || window.webkitAudioContext, actx = null;
+function ac(){ if(!actx){ if(!AC) return null; actx = new AC(); } if(actx.state === "suspended") actx.resume(); return actx; }
+function tone(f,d,ty,g){ var c=ac(); if(!c) return; var t=c.currentTime, o=c.createOscillator(), v=c.createGain();
+  o.type=ty||"sine"; o.frequency.value=f; v.gain.setValueAtTime(.0001,t); v.gain.exponentialRampToValueAtTime(g||.12,t+.015);
+  v.gain.exponentialRampToValueAtTime(.0001,t+d); o.connect(v); v.connect(c.destination); o.start(t); o.stop(t+d+.05); }
+var S = {
+  click:function(){ tone(540,.06,"triangle",.08); },
+  correct:function(){ var t=ac().currentTime; tone(660,.12); tone(880,.16); tone(1180,.2); },
+  wrong:function(){ tone(196,.2,"sawtooth",.09); tone(148,.3,"sawtooth",.09); },
+  win:function(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){ tone(f,.3); }, i*130); }); },
+  flip:function(){ tone(760,.05); tone(1120,.07); }
+};
+
+var $ = function (id){ return document.getElementById(id); };
+var RANGES = { e:[1,9], m:[1,10], h:[3,13] };
+var LEVELS = { e:"简单", m:"中等", h:"困难" };
+var level = "e";
+var TARGET = 8;
+var nums = [], sol = null, idx = 0, round = 0, score = 0, streak = 0, maxStreak = 0, right = 0, solved = false, busy = false;
+var best = parseInt(localStorage.getItem("game24_best") || "0", 10);
+$("best").textContent = best;
+
+/* 用一组运算符（左结合，逐步整值）求值 */
+function evalOps(ops){
+  var a = nums[0];
+  for (var i = 0; i < 3; i++){
+    var b = nums[i + 1], op = ops[i];
+    if (op === "+") a += b;
+    else if (op === "-") a -= b;
+    else if (op === "*") a *= b;
+    else { if (b === 0 || a % b !== 0) return null; a /= b; }
+  }
+  return a;
+}
+function fmt(ops){
+  var s = [];
+  var a = nums[0]; s.push(a);
+  for (var i = 0; i < 3; i++){
+    var op = ops[i], b = nums[i + 1];
+    if (op === "+") { a += b; s.push("＋", b); }
+    else if (op === "-") { a -= b; s.push("－", b); }
+    else if (op === "*") { a *= b; s.push("×", b); }
+    else { a /= b; s.push("÷", b); }
+    s.push("=", a);
+  }
+  return s.join(" ");
+}
+function gen(){
+  var r = RANGES[level], solC = null;
+  for (var att = 0; att < 800 && !solC; att++){
+    var lo = r[0], hi = r[1], arr = [], seen = {};
+    while (arr.length < 4){ var n = lo + Math.floor(Math.random() * (hi - lo + 1)); if (!seen[n]) { seen[n] = 1; arr.push(n); } }
+    nums = arr;
+    var ops = ["+", "-", "*", "/"];
+    for (var a = 0; a < 4 && !solC; a++)
+      for (var b = 0; b < 4 && !solC; b++)
+        for (var c = 0; c < 4 && !solC; c++){
+          var o = [ops[a], ops[b], ops[c]];
+          if (evalOps(o) === 24) solC = o.slice();
+        }
+    if (solC) break;
+  }
+  if (!solC){ nums = [1, 3, 4, 6]; solC = ["*", "+", "+"]; }   // 兜底
+  sol = solC;
+}
+function render(){
+  gen();
+  solved = false; busy = false;
+  $("cur").textContent = round + 1;
+  ["n0","n1","n2","n3"].forEach(function (id, i){ $(id).textContent = nums[i]; });
+  $("o1").value = "+"; $("o2").value = "+"; $("o3").value = "+";
+  $("barI").style.width = (round / TARGET * 100) + "%";
+  updateLive();
+  $("steps").innerHTML = "👇 摆好算式后点「验证」！";
+}
+function curOps(){ return [$("o1").value, $("o2").value, $("o3").value]; }
+function liveVal(ops){
+  var a = nums[0], ok = true;
+  for (var i = 0; i < 3; i++){
+    var b = nums[i + 1], op = ops[i];
+    if (op === "+") a += b; else if (op === "-") a -= b; else if (op === "*") a *= b;
+    else { if (b === 0) { ok = false; break; } a /= b; }
+  }
+  return ok ? a : null;
+}
+function updateLive(){
+  var v = liveVal(curOps());
+  $("live").textContent = (v === null) ? "?" : (Math.round(v * 100) / 100);
+}
+["o1","o2","o3"].forEach(function (id){ $(id).onchange = function(){ S.flip(); updateLive(); }; });
+
+function check(){
+  if (busy) return;
+  busy = true;
+  var v = liveVal(curOps());
+  if (v === 24){
+    solved = true; score += 10 + streak * 2; streak++; maxStreak = Math.max(maxStreak, streak); right++;
+    S.correct();
+    $("steps").innerHTML = '<span class="ok">🎉 完全正确！</span> ' + nums[0] + " " + fmtStep(curOps());
+    setTimeout(function(){ round++; if (round >= TARGET) finish(); else render(); }, 1600);
+  } else {
+    streak = 0; S.wrong();
+    $("steps").innerHTML = '<span class="bad">还差一点，看看参考答案 ↓</span><br>例如：' + fmt(sol);
+    setTimeout(function(){ round++; if (round >= TARGET) finish(); else render(); }, 2800);
+  }
+  $("score").textContent = score; $("streak").textContent = streak;
+}
+function fmtStep(ops){
+  var s = ""; var a = nums[0];
+  for (var i = 0; i < 3; i++){
+    var b = nums[i + 1], op = ops[i];
+    if (op === "+") { a += b; s += "＋" + b; }
+    else if (op === "-") { a -= b; s += "－" + b; }
+    else if (op === "*") { a *= b; s += "×" + b; }
+    else { a /= b; s += "÷" + b; }
+  }
+  return "→ " + s + " = " + a;
+}
+function skip(){
+  if (busy) return;
+  busy = true;
+  S.wrong(); streak = 0;
+  $("steps").innerHTML = '<span class="bad">已跳过</span>　参考答案：' + fmt(sol);
+  setTimeout(function(){ round++; if (round >= TARGET) finish(); else render(); }, 2000);
+  $("score").textContent = score; $("streak").textContent = streak;
+}
+function finish(){
+  if (score > best){ best = score; localStorage.setItem("game24_best", best); }
+  var ratio = right / TARGET;
+  $("rankEmoji").textContent = ratio === 1 ? "🏆" : ratio >= .7 ? "🥇" : ratio >= .4 ? "🥈" : "🥉";
+  $("rankTitle").textContent = ratio >= .7 ? "心算大师诞生！" : "再来一次，越练越快！";
+  $("fScore").textContent = score; $("fRight").textContent = right; $("fStreak").textContent = maxStreak; $("fBest").textContent = best;
+  $("rankNote").innerHTML = "难度：" + LEVELS[level] + " · " + (ratio >= .7 ? "超强的算术直觉 ✨" : "记住参考答案的技巧，进步看得见 💪");
+  S.win();
+  $("ovEnd").classList.remove("hidden");
+}
+function start(d){
+  level = d; round = 0; score = 0; streak = 0; maxStreak = 0; right = 0;
+  $("score").textContent = 0; $("streak").textContent = 0;
+  $("ovStart").classList.add("hidden"); $("ovEnd").classList.add("hidden");
+  render();
+}
+document.querySelectorAll("#lvlBox button").forEach(function (b){
+  b.onclick = function(){ S.click(); document.querySelectorAll("#lvlBox button").forEach(function (x){ x.classList.remove("on"); }); b.classList.add("on"); level = b.dataset.d; };
+});
+document.addEventListener("pointerdown", function(){ ac(); }, { once:true, capture:true });
+$("btnStart").onclick = function(){ S.click(); start(level); };
+$("btnAgain").onclick = function(){ S.click(); start(level); };
+$("btnCheck").onclick = function(){ S.click(); check(); };
+$("btnSkip").onclick = function(){ S.click(); skip(); };
+</script>
+</body>
+</html>

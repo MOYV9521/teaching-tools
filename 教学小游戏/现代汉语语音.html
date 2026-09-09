@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>现代汉语语音考点记忆游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2c5282;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+        .question {
+            padding: 20px;
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .question:after {
+            content: "▶";
+            transition: transform 0.3s ease;
+        }
+        .card.active .question:after {
+            transform: rotate(90deg);
+        }
+        .answer {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.3s ease;
+            background-color: #fff;
+        }
+        .card.active .answer {
+            padding: 20px;
+            max-height: 500px;
+        }
+        .answer p {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .tag {
+            display: inline-block;
+            background-color: #ed8936;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>现代汉语语音专题考点记忆游戏</h1>
+    <p style="text-align: center; margin-bottom: 20px; color: #718096; font-size: 16px;">点击问题卡片查看答案，再点击可收起</p>
+    
+    <div class="card-container" id="cardContainer">
+        <!-- 卡片1：音位 -->
+        <div class="card">
+            <div class="question">预测考点1：音位</div>
+            <div class="answer">
+                <p><strong>答案：</strong>音位是某一语言或方言中能区别意义的最小语音单位。例如：普通话中“班”[bān]和“潘”[pʰān]的声母[b]和[pʰ]是不同音位，因替换后词义改变；而英语中“spin”的[p]不送气与“pin”的[pʰ]送气属于同一音位的变体，不区别意义。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片2：韵腹 -->
+        <div class="card">
+            <div class="question">预测考点2：韵腹</div>
+            <div class="answer">
+                <p><strong>答案：</strong>韵腹是韵母中的核心元音，发音最响亮、开口度最大，是韵母结构的必要组成部分。例如：普通话韵母“uang”的韵腹是[ɑ]，韵头是[u]，韵尾是[ŋ]；韵母“i”单独存在时，[i]本身即为韵腹。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片3：入声 -->
+        <div class="card">
+            <div class="question">预测考点3：入声</div>
+            <div class="answer">
+                <p><strong>答案：</strong>入声是汉语方言中以塞音（[-p/-t/-k]）收尾、发音短促的声调类别。例如：粤语中“急”[gap1]以[-p]收尾，“八”[baat3]以[-t]收尾，“百”[baak3]以[-k]收尾；普通话中入声已消失，原入声字如“白”[bái]派入阳平调。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片4：语流音变 -->
+        <div class="card">
+            <div class="question">预测考点4：语流音变</div>
+            <div class="answer">
+                <p><strong>答案：</strong>语流音变指连贯说话时语音受前后音影响发生的变化。例如：普通话中“不”在去声前变阳平（“不会”[bú huì]），“妈妈”第二个“妈”读轻声[ma]；英语中“ten boys”的[n]受[b]影响同化为[m]（[tem bɔɪz]）。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片5：四呼 -->
+        <div class="card">
+            <div class="question">预测考点5：四呼</div>
+            <div class="answer">
+                <p><strong>答案：</strong>四呼是普通话按韵母开头元音唇形对韵母的分类，包括：</p>
+                <p>- 开口呼（无韵头，韵腹非i/u/ü：a、an）；</p>
+                <p>- 齐齿呼（韵头/韵腹为i：i、ia）；</p>
+                <p>- 合口呼（韵头/韵腹为u：u、ua）；</p>
+                <p>- 撮口呼（韵头/韵腹为ü：ü、üe）。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片6：音素 -->
+        <div class="card">
+            <div class="question">预测考点6：音素</div>
+            <div class="answer">
+                <p><strong>答案：</strong>音素是最小的语音单位，是从音色的角度划分出来的。例如，“好”（hǎo）这个音节，可划分出“h”“a”“o”三个音素；“来”（lái）可划分出“l”“a”“i”三个音素。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片7：元音 -->
+        <div class="card">
+            <div class="question">预测考点7：元音</div>
+            <div class="answer">
+                <p><strong>答案：</strong>元音是气流颤动声带，在口腔、咽头不受阻碍而形成的音素。发音时，声带振动，气流通过口腔时不受阻碍而发出清晰、响亮的音。如“啊”（ā）、“哦”（ō）、“鹅”（é）等单韵母都是元音。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片8：辅音 -->
+        <div class="card">
+            <div class="question">预测考点8：辅音</div>
+            <div class="answer">
+                <p><strong>答案：</strong>辅音是气流在口腔或咽头受阻碍而形成的音素，又叫子音。发音时，气流在发音器官的某一部位受到阻碍，通过克服阻碍而发音。例如，“b”“p”“m”“f”等声母都是辅音。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片9：声母 -->
+        <div class="card">
+            <div class="question">预测考点9：声母</div>
+            <div class="answer">
+                <p><strong>答案：</strong>声母位于音节前段，主要由辅音构成。例如，在“班”（bān）这个音节中，“b”是声母；“天”（tiān）中，“t”是声母。有的音节开头没有辅音，称为零声母音节，如“啊”（ā）、“哦”（ō）等。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片10：韵母 -->
+        <div class="card">
+            <div class="question">预测考点10：韵母</div>
+            <div class="answer">
+                <p><strong>答案：</strong>韵母位于音节的后段，由元音或元音加辅音构成。例如，“花”（huā）中的“ua”是韵母；“根”（gēn）中的“en”是韵母。韵母可分为单韵母、复韵母、鼻韵母等类型。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片11：声调 -->
+        <div class="card">
+            <div class="question">预测考点11：声调</div>
+            <div class="answer">
+                <p><strong>答案：</strong>声调指的是依附在声韵结构中具有区别意义的音高变化。例如，“妈”（mā）、“麻”（má）、“马”（mǎ）、“骂”（mà），声母和韵母相同，但声调不同，意义也不同。普通话中有阴平、阳平、上声、去声四个声调。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片12：调值 -->
+        <div class="card">
+            <div class="question">预测考点12：调值</div>
+            <div class="answer">
+                <p><strong>答案：</strong>调值指音节高低升降曲折长短的变化形式，也就是声调的实际音值或读法。普通话采用五度标记法来表示调值，如阴平是55，阳平是35，上声是214，去声是51。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片13：发音部位 -->
+        <div class="card">
+            <div class="question">预测考点13：发音部位</div>
+            <div class="answer">
+                <p><strong>答案：</strong>发音时，气流受到阻碍的位置叫做发音部位。例如，“b”“p”“m”是双唇音，发音部位是双唇；“f”是唇齿音，发音部位是上齿和下唇；“d”“t”“n”“l”是舌尖中音，发音部位是舌尖和上齿龈。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片14：发音方法 -->
+        <div class="card">
+            <div class="question">预测考点14：发音方法</div>
+            <div class="answer">
+                <p><strong>答案：</strong>声母的发音方法指的是，发音时喉头、口腔和鼻腔节制气流的方式和状况。例如，根据发音时气流强弱，可分为送气音和不送气音，“p”“t”“k”等是送气音，“b”“d”“g”等是不送气音；根据发音时声带是否振动，可分为清音和浊音，“s”“f”“sh”等是清音，“m”“n”“l”等是浊音。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片15：单元音 -->
+        <div class="card">
+            <div class="question">预测考点15：单元音</div>
+            <div class="answer">
+                <p><strong>答案：</strong>单元音是发音时舌位、唇形及开口度始终不变的元音。例如，“a”“o”“e”“i”“u”“ü”等单韵母都是单元音。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片16：复韵母 -->
+        <div class="card">
+            <div class="question">预测考点16：复韵母</div>
+            <div class="answer">
+                <p><strong>答案：</strong>复韵母是由两个或三个元音结合而成的韵母。例如，“ai”“ei”“ao”“ou”等是前响复韵母，“ia”“ie”“ua”“uo”“üe”等是后响复韵母，“iao”“iou”“uai”“uei”等是中响复韵母。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片17：鼻韵母 -->
+        <div class="card">
+            <div class="question">预测考点17：鼻韵母</div>
+            <div class="answer">
+                <p><strong>答案：</strong>鼻韵母是由一个或两个元音后面带上鼻辅音构成的韵母。例如，“an”“en”“in”“un”“ün”等是前鼻音韵母，“ang”“eng”“ing”“ong”等是后鼻音韵母。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片18：轻声 -->
+        <div class="card">
+            <div class="question">预测考点18：轻声</div>
+            <div class="answer">
+                <p><strong>答案：</strong>轻声是汉语中一种特殊的变调现象，是在一定条件下读得又短又轻的调子。例如，“爸爸”“妈妈”“石头”“我们”等词语中的后一个音节通常读轻声。轻声不具有固定的调值，它的音高取决于前一个音节的声调。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片19：儿化 -->
+        <div class="card">
+            <div class="question">预测考点19：儿化</div>
+            <div class="answer">
+                <p><strong>答案：</strong>儿化是指在韵母后面加上卷舌动作，使韵母发生音变，成为卷舌韵母，也叫“儿化韵”。例如，“胡同儿”（hú tòngr）、“一会儿”（yī huìr）。儿化不仅改变了语音，有时还会改变词义和词性。</p>
+            </div>
+        </div>
+        
+        <!-- 卡片20：合口呼零声母 -->
+        <div class="card">
+            <div class="question">预测考点20：合口呼零声母</div>
+            <div class="answer">
+                <p><strong>答案：</strong>合口呼是指韵头或韵腹为“u”的韵母。合口呼零声母是指以合口呼韵母开头，没有辅音声母的音节。例如，“乌”（wū）、“蛙”（wā）、“窝”（wō）等音节，其中的“w”是隔音字母，不是声母，属于合口呼零声母音节。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 点击卡片切换显示答案
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const question = card.querySelector('.question');
+                question.addEventListener('click', function() {
+                    card.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+<script src="sfx.js"></script>
+</body>
+</html>

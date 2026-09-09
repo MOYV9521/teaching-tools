@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>化学元素符号翻翻乐</title>
+<style>
+  *{ margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei","PingFang SC",-apple-system,sans-serif; }
+  body{ background:radial-gradient(120% 90% at 20% 0%,#101a2e,#070b14 70%); color:#e8f1ff; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; padding:26px 14px; }
+  .back{ position:fixed; top:16px; left:16px; background:rgba(255,255,255,.08); color:#bfd2ff; border:1px solid rgba(255,255,255,.2);
+    padding:8px 14px; border-radius:10px; font-size:13px; text-decoration:none; z-index:20; }
+  .back:hover{ background:rgba(255,255,255,.18); color:#fff; }
+  h1{ font-size:26px; text-align:center; }
+  h1 span{ background:linear-gradient(90deg,#6ee7b7,#3dd6ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub{ color:#8fa6cf; text-align:center; font-size:13px; margin-top:6px; }
+  .hud{ display:flex; justify-content:center; gap:26px; margin:18px 0 4px; flex-wrap:wrap; font-size:14px; color:#aebfe2; }
+  .hud b{ color:#6ee7b7; font-size:18px; }
+  .grid{ display:grid; grid-template-columns:repeat(5,minmax(58px,1fr)); gap:10px; width:100%; max-width:560px; margin:16px auto; perspective:900px; }
+  .cell{ aspect-ratio:1; position:relative; cursor:pointer; border-radius:14px; }
+  .in{ position:absolute; inset:0; transition:transform .5s; transform-style:preserve-3d; }
+  .cell.flip .in{ transform:rotateY(180deg); }
+  .f{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:14px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.16); }
+  .f.back{ background:linear-gradient(145deg,#243a63,#16233f); font-size:22px; color:#7fd6ff; }
+  .f.front{ background:linear-gradient(145deg,#e8fbff,#c8f6ea); color:#0c3550; transform:rotateY(180deg); font-weight:900; }
+  .f.front.sym{ background:linear-gradient(145deg,#ffe9a8,#ffc46b); color:#5c3a00; font-size:clamp(16px,5vw,26px); letter-spacing:1px; }
+  .cell.done{ opacity:.55; pointer-events:none; }
+  .cell.done .f.front{ border-color:#22c55e; box-shadow:0 0 0 2px rgba(34,197,94,.5); }
+  .cell.hit .f.front{ box-shadow:0 0 0 3px #fff,0 0 20px #fff; }
+  .cell.miss{ animation:shake .45s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)} }
+  .small{ font-size:11px; font-weight:700; opacity:.75; }
+  .btn{ margin-top:16px; padding:12px 30px; border:none; border-radius:13px; font-weight:800; font-size:15px; cursor:pointer;
+    background:linear-gradient(120deg,#34d399,#3dd6ff); color:#06222a; box-shadow:0 8px 22px rgba(52,211,153,.3); }
+  .btn:hover{ filter:brightness(1.1); transform:translateY(-2px); }
+  .mask{ position:fixed; inset:0; background:rgba(4,8,14,.9); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .mask.on{ display:flex; }
+  .box{ background:#0e1830; border:1px solid rgba(255,255,255,.14); padding:36px 40px; border-radius:22px; text-align:center; max-width:420px; width:100%; }
+  .box .star{ font-size:54px; }
+  .box h2{ margin-top:8px; }
+  .rrow{ display:flex; justify-content:space-between; padding:10px 2px; border-bottom:1px dashed rgba(255,255,255,.14); }
+  .rrow b{ color:#6ee7b7; }
+</style>
+</head>
+<body>
+<a class="back" href="../index.html#library" target="_top">‹ 返回展厅</a>
+<h1>元素符号 <span>翻翻乐</span></h1>
+<div class="sub">记忆配对：中文名称 ↔ 元素符号（一次翻两张）</div>
+<div class="hud"><span>配对 <b id="pairs">0</b> / 10</span><span>翻牌 <b id="turns">0</b> 次</span><span>用时 <b id="timer">00:00</b></span></div>
+
+<div class="grid" id="grid"></div>
+<button class="btn" id="restart">重新洗牌</button>
+
+<div class="mask" id="mask"><div class="box">
+  <div class="star" id="star">🎉</div>
+  <h2 id="mt">全部配对成功！</h2>
+  <div style="margin:16px 0;">
+    <div class="rrow"><span>总翻牌次数</span><b id="mturns">0</b></div>
+    <div class="rrow"><span>用时</span><b id="mtime">00:00</b></div>
+    <div class="rrow"><span>效率评级</span><b id="mrank">—</b></div>
+  </div>
+  <button class="btn" id="again">再来一局</button>
+</div></div>
+
+<script>
+const ELE=[
+  ["氢","H"],["氦","He"],["锂","Li"],["铍","Be"],["硼","B"],
+  ["碳","C"],["氮","N"],["氧","O"],["氟","F"],["氖","Ne"]
+];  // 10 对（前 10 号元素）
+let cards=[], open=[], lock=false, pairs=0, turns=0, sec=0, tmr;
+const $=s=>document.querySelector(s);
+
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function init(){
+  clearInterval(tmr); pairs=0; turns=0; sec=0; lock=false; open=[];
+  $("#pairs").textContent="0"; $("#turns").textContent="0"; $("#timer").textContent="00:00";
+  $("#mask").classList.remove("on");
+  cards=shuffle(ELE.flatMap((e,i)=>[
+    {id:i,face:"zh",txt:e[0]},{id:i,face:"sym",txt:e[1]}
+  ]));
+  $("#grid").innerHTML=cards.map((c,k)=>`<div class="cell" data-k="${k}">
+      <div class="in"><div class="f back">?</div><div class="f front ${c.face==="sym"?"sym":""}">${c.txt}<span class="small" style="display:none"></span></div></div>
+    </div>`).join("");
+  document.querySelectorAll(".cell").forEach(el=>el.addEventListener("click",()=>flip(el)));
+  tmr=setInterval(()=>{ sec++; $("#timer").textContent=fmt(sec); },1000);
+}
+function fmt(s){ return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+function flip(el){
+  if(lock || el.classList.contains("flip") || el.classList.contains("done")) return;
+  el.classList.add("flip"); open.push(el);
+  if(open.length===2){ turns++; $("#turns").textContent=turns; check(); }
+}
+function check(){
+  lock=true;
+  const [a,b]=open; const ca=cards[+a.dataset.k], cb=cards[+b.dataset.k];
+  if(ca.id===cb.id){  // 配对成功
+    setTimeout(()=>{ a.classList.add("done"); b.classList.add("done"); pairs++; $("#pairs").textContent=pairs;
+      lock=false; open=[];
+      if(pairs===ELE.length) win();
+    },420);
+  }else{
+    a.classList.add("miss"); b.classList.add("miss");
+    setTimeout(()=>{ a.classList.remove("flip"); b.classList.remove("flip");
+      a.classList.remove("miss"); b.classList.remove("miss"); lock=false; open=[]; },750);
+  }
+}
+function win(){
+  clearInterval(tmr);
+  const star= turns<=16?"🏆":turns<=22?"🥇":turns<=30?"🥈":"🎖️";
+  const rank= turns<=16?"记忆大师！":turns<=22?"非常厉害":turns<=30?"不错哦":"再练练能更好";
+  $("#star").textContent=star; $("#mturns").textContent=turns+" 次"; $("#mtime").textContent=fmt(sec);
+  $("#mrank").textContent=rank; $("#mask").classList.add("on");
+}
+$("#restart").onclick=init; $("#again").onclick=init;
+init();
+</script>
+<script src="sfx.js"></script>
+</body>
+</html>

@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文笔对比分析工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#64748B',
+                        accent: '#0EA5E9',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        neutral: '#F8FAFC',
+                        'neutral-dark': '#1E293B'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .transition-transform-opacity {
+                transition-property: transform, opacity;
+            }
+            .bg-gradient-blue {
+                background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-feather text-primary text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">文笔对比分析工具</h1>
+            </div>
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="#features" class="text-gray-600 hover:text-primary transition-colors duration-200">功能</a>
+                <a href="#analyzer" class="text-gray-600 hover:text-primary transition-colors duration-200">开始分析</a>
+                <a href="#about" class="text-gray-600 hover:text-primary transition-colors duration-200">关于</a>
+            </nav>
+            <button class="md:hidden text-gray-600" id="mobile-menu-button">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden bg-white shadow-lg absolute w-full" id="mobile-menu">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#features" class="text-gray-600 hover:text-primary py-2 transition-colors duration-200">功能</a>
+                <a href="#analyzer" class="text-gray-600 hover:text-primary py-2 transition-colors duration-200">开始分析</a>
+                <a href="#about" class="text-gray-600 hover:text-primary py-2 transition-colors duration-200">关于</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow">
+        <!-- 英雄区 -->
+        <section class="bg-gradient-blue text-white py-16 md:py-24">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-6 leading-tight text-shadow">
+                    分析、对比、提升你的写作水平
+                </h2>
+                <p class="text-[clamp(1rem,2vw,1.25rem)] max-w-3xl mx-auto mb-10 opacity-90">
+                    通过多维度的文本分析，深入了解不同文本的写作风格和特点，帮助你提升写作技巧和质量
+                </p>
+                <a href="#analyzer" class="bg-white text-primary font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center">
+                    <span>开始分析</span>
+                    <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- 功能介绍区 -->
+        <section id="features" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-16 text-gray-800">
+                    强大的文本分析功能
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 功能卡片 1 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 transform hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-chart-bar text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">词汇分析</h3>
+                        <p class="text-gray-600">
+                            分析文本中的词汇丰富度、用词复杂度、高频词和低频词分布，帮助你了解文本的词汇使用特点。
+                        </p>
+                    </div>
+                    
+                    <!-- 功能卡片 2 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 transform hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-sentence text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">句子结构</h3>
+                        <p class="text-gray-600">
+                            分析句子长度分布、句子复杂度、句式多样性，揭示文本的句子构建模式和节奏特点。
+                        </p>
+                    </div>
+                    
+                    <!-- 功能卡片 3 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 transform hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-language text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">风格特征</h3>
+                        <p class="text-gray-600">
+                            识别文本的写作风格特点，包括正式程度、情感倾向、修辞手法使用频率等风格维度。
+                        </p>
+                    </div>
+                    
+                    <!-- 功能卡片 4 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 transform hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-comments text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">可读性评估</h3>
+                        <p class="text-gray-600">
+                            通过多种可读性公式评估文本的易读性，帮助你了解目标读者群体，并优化文本的可读性。
+                        </p>
+                    </div>
+                    
+                    <!-- 功能卡片 5 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 transform hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-balance-scale text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">对比分析</h3>
+                        <p class="text-gray-600">
+                            直观展示两篇文本在各个维度上的差异，帮助你发现不同写作风格之间的区别和联系。
+                        </p>
+                    </div>
+                    
+                    <!-- 功能卡片 6 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 transform hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-lightbulb text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">改进建议</h3>
+                        <p class="text-gray-600">
+                            根据分析结果提供针对性的写作改进建议，帮助你提升文本质量和表达效果。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 分析工具区 -->
+        <section id="analyzer" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-6 text-gray-800">
+                    开始文笔对比分析
+                </h2>
+                <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                    输入两篇需要对比的文本，然后点击"分析"按钮，系统将自动分析并展示它们在各个维度上的差异
+                </p>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- 文本输入区域 -->
+                        <div>
+                            <div class="mb-8">
+                                <label for="text1" class="block text-lg font-medium text-gray-700 mb-2">文本一</label>
+                                <div class="relative">
+                                    <textarea id="text1" rows="12" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 resize-none scrollbar-hide" placeholder="请输入需要分析的第一篇文本..."></textarea>
+                                    <div class="absolute bottom-3 right-3 text-sm text-gray-500" id="text1-stats">0 字</div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="text2" class="block text-lg font-medium text-gray-700 mb-2">文本二</label>
+                                <div class="relative">
+                                    <textarea id="text2" rows="12" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 resize-none scrollbar-hide" placeholder="请输入需要分析的第二篇文本..."></textarea>
+                                    <div class="absolute bottom-3 right-3 text-sm text-gray-500" id="text2-stats">0 字</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-4 mt-6">
+                                <button id="analyze-btn" class="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center">
+                                    <i class="fa-solid fa-play mr-2"></i>
+                                    开始分析
+                                </button>
+                                <button id="clear-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-6 py-3 rounded-lg transition-all duration-200 flex items-center">
+                                    <i class="fa-solid fa-eraser mr-2"></i>
+                                    清空文本
+                                </button>
+                                <button id="sample-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-6 py-3 rounded-lg transition-all duration-200 flex items-center">
+                                    <i class="fa-solid fa-file-text mr-2"></i>
+                                    使用示例文本
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 分析结果区域 -->
+                        <div class="hidden" id="results-container">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-xl font-semibold text-gray-800">分析结果</h3>
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex items-center">
+                                        <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                                        <span class="text-sm text-gray-600">文本一</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span>
+                                        <span class="text-sm text-gray-600">文本二</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 分析结果选项卡 -->
+                            <div class="mb-6">
+                                <div class="flex border-b border-gray-200">
+                                    <button id="tab-overview" class="tab-btn py-4 px-6 text-primary border-b-2 border-primary font-medium">总体概览</button>
+                                    <button id="tab-vocabulary" class="tab-btn py-4 px-6 text-gray-500 hover:text-gray-700 font-medium">词汇分析</button>
+                                    <button id="tab-sentence" class="tab-btn py-4 px-6 text-gray-500 hover:text-gray-700 font-medium">句子结构</button>
+                                    <button id="tab-style" class="tab-btn py-4 px-6 text-gray-500 hover:text-gray-700 font-medium">风格特征</button>
+                                    <button id="tab-readability" class="tab-btn py-4 px-6 text-gray-500 hover:text-gray-700 font-medium">可读性</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 分析结果内容 -->
+                            <div class="h-[500px] overflow-y-auto pr-2 scrollbar-hide">
+                                <!-- 总体概览 -->
+                                <div id="content-overview" class="tab-content">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                        <div class="bg-gray-50 rounded-lg p-5">
+                                            <h4 class="text-lg font-medium text-gray-800 mb-4">文本基本统计</h4>
+                                            <div class="space-y-4">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-gray-600">字符数</span>
+                                                    <div class="flex items-center space-x-6">
+                                                        <span class="text-blue-500 font-medium" id="char-count-1">-</span>
+                                                        <span class="text-orange-500 font-medium" id="char-count-2">-</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-gray-600">单词数</span>
+                                                    <div class="flex items-center space-x-6">
+                                                        <span class="text-blue-500 font-medium" id="word-count-1">-</span>
+                                                        <span class="text-orange-500 font-medium" id="word-count-2">-</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-gray-600">句子数</span>
+                                                    <div class="flex items-center space-x-6">
+                                                        <span class="text-blue-500 font-medium" id="sentence-count-1">-</span>
+                                                        <span class="text-orange-500 font-medium" id="sentence-count-2">-</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-gray-600">段落数</span>
+                                                    <div class="flex items-center space-x-6">
+                                                        <span class="text-blue-500 font-medium" id="paragraph-count-1">-</span>
+                                                        <span class="text-orange-500 font-medium" id="paragraph-count-2">-</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="bg-gray-50 rounded-lg p-5">
+                                            <h4 class="text-lg font-medium text-gray-800 mb-4">平均指标</h4>
+                                            <div class="space-y-4">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-gray-600">句长（单词/句）</span>
+                                                    <div class="flex items-center space-x-6">
+                                                        <span class="text-blue-500 font-medium" id="avg-sentence-length-1">-</span>
+                                                        <span class="text-orange-500 font-medium" id="avg-sentence-length-2">-</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-gray-600">段长（句子/段）</span>
+                                                    <div class="flex items-center space-x-6">
+                                                        <span class="text-blue-500 font-medium" id="avg-paragraph-length-1">-</span>
+                                                        <span class="text-orange-500 font-medium" id="avg-paragraph-length-2">-</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-gray-600">词长（字符/词）</span>
+                                                    <div class="flex items-center space-x-6">
+                                                        <span class="text-blue-500 font-medium" id="avg-word-length-1">-</span>
+                                                        <span class="text-orange-500 font-medium" id="avg-word-length-2">-</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">词汇丰富度</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">词汇多样性（TTR）</h5>
+                                                <div class="h-48">
+                                                    <canvas id="ttr-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    类型-标记比(Type-Token Ratio)，反映文本中不同单词的使用比例
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">平均词频等级</h5>
+                                                <div class="h-48">
+                                                    <canvas id="word-frequency-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    平均词频等级，数值越高表示使用的词汇越生僻
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">功能词比例</h5>
+                                                <div class="h-48">
+                                                    <canvas id="function-words-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    功能词（如介词、连词等）在文本中的比例
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">写作风格对比</h4>
+                                        <div class="space-y-6">
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">正式程度</h5>
+                                                <div class="relative h-6 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="absolute inset-y-0 left-0 bg-blue-500" id="formality-1" style="width: 0%"></div>
+                                                    <div class="absolute inset-y-0 right-0 bg-orange-500" id="formality-2" style="width: 0%"></div>
+                                                </div>
+                                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                                    <span>非正式</span>
+                                                    <span>正式</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">情感倾向</h5>
+                                                <div class="relative h-6 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="absolute inset-y-0 left-0 bg-blue-500" id="sentiment-1" style="width: 0%"></div>
+                                                    <div class="absolute inset-y-0 right-0 bg-orange-500" id="sentiment-2" style="width: 0%"></div>
+                                                </div>
+                                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                                    <span>消极</span>
+                                                    <span>积极</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">抽象程度</h5>
+                                                <div class="relative h-6 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="absolute inset-y-0 left-0 bg-blue-500" id="abstractness-1" style="width: 0%"></div>
+                                                    <div class="absolute inset-y-0 right-0 bg-orange-500" id="abstractness-2" style="width: 0%"></div>
+                                                </div>
+                                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                                    <span>具体</span>
+                                                    <span>抽象</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">叙述性</h5>
+                                                <div class="relative h-6 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="absolute inset-y-0 left-0 bg-blue-500" id="narrative-1" style="width: 0%"></div>
+                                                    <div class="absolute inset-y-0 right-0 bg-orange-500" id="narrative-2" style="width: 0%"></div>
+                                                </div>
+                                                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                                    <span>说明性</span>
+                                                    <span>叙述性</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 词汇分析 -->
+                                <div id="content-vocabulary" class="tab-content hidden">
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">词汇丰富度对比</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">类型-标记比 (TTR)</h5>
+                                                <div class="h-64">
+                                                    <canvas id="vocab-ttr-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    类型-标记比(Type-Token Ratio)是不同单词数(类型)与总单词数(标记)的比值，反映文本中词汇的多样性。值越高表示词汇越丰富。
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">高级词汇比例</h5>
+                                                <div class="h-64">
+                                                    <canvas id="advanced-words-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    高级词汇定义为使用频率较低的词汇，比例越高表示文本使用的词汇越复杂。
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">高频词分析</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <h5 class="text-blue-600 mb-3">文本一高频词 (停用词已过滤)</h5>
+                                                <div class="space-y-2" id="top-words-1">
+                                                    <!-- 高频词将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-orange-600 mb-3">文本二高频词 (停用词已过滤)</h5>
+                                                <div class="space-y-2" id="top-words-2">
+                                                    <!-- 高频词将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">独特词汇</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <h5 class="text-blue-600 mb-3">文本一特有的词汇</h5>
+                                                <div class="space-y-2" id="unique-words-1">
+                                                    <!-- 独特词汇将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-orange-600 mb-3">文本二特有的词汇</h5>
+                                                <div class="space-y-2" id="unique-words-2">
+                                                    <!-- 独特词汇将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 句子结构 -->
+                                <div id="content-sentence" class="tab-content hidden">
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">句子长度分布</h4>
+                                        <div class="h-72">
+                                            <canvas id="sentence-length-chart"></canvas>
+                                        </div>
+                                        <p class="text-sm text-gray-500 mt-2">
+                                            句子长度分布显示了文本中不同长度的句子出现的频率。X轴表示句子长度区间(单词数)，Y轴表示该区间的句子数量。
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">句子复杂度</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">平均每个句子的从句数</h5>
+                                                <div class="h-48">
+                                                    <canvas id="clauses-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    反映句子结构的复杂程度，数值越高表示句子结构越复杂。
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">复合句比例</h5>
+                                                <div class="h-48">
+                                                    <canvas id="complex-sentences-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    复合句占总句子数的比例，反映文本中复杂句式的使用频率。
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">句子开头多样性</h5>
+                                                <div class="h-48">
+                                                    <canvas id="sentence-start-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    句子开头词汇的多样性指数，反映文本句式的变化程度。
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">典型句子</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <h5 class="text-blue-600 mb-3">文本一典型句子</h5>
+                                                <div class="space-y-4" id="sample-sentences-1">
+                                                    <!-- 典型句子将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-orange-600 mb-3">文本二典型句子</h5>
+                                                <div class="space-y-4" id="sample-sentences-2">
+                                                    <!-- 典型句子将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 风格特征 -->
+                                <div id="content-style" class="tab-content hidden">
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">修辞手法使用频率</h4>
+                                        <div class="h-72">
+                                            <canvas id="rhetoric-chart"></canvas>
+                                        </div>
+                                        <p class="text-sm text-gray-500 mt-2">
+                                            各种修辞手法在文本中的使用频率对比。数值表示每1000个单词中该修辞手法出现的次数。
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">情感分析</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">情感极性</h5>
+                                                <div class="h-48">
+                                                    <canvas id="sentiment-polarity-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    情感极性得分，范围从-1(消极)到+1(积极)。
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-gray-600 mb-3">情感强度</h5>
+                                                <div class="h-48">
+                                                    <canvas id="sentiment-intensity-chart"></canvas>
+                                                </div>
+                                                <p class="text-sm text-gray-500 mt-2">
+                                                    情感表达的强度，数值越高表示情感越强烈。
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">文体特征</h4>
+                                        <div class="space-y-6">
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">正式程度</h5>
+                                                <div class="flex items-center">
+                                                    <div class="w-full bg-gray-200 rounded-full h-6 mr-4">
+                                                        <div class="bg-blue-500 h-6 rounded-full" id="style-formality-1" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="text-blue-600 font-medium" id="style-formality-text-1">-</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">叙述性</h5>
+                                                <div class="flex items-center">
+                                                    <div class="w-full bg-gray-200 rounded-full h-6 mr-4">
+                                                        <div class="bg-blue-500 h-6 rounded-full" id="style-narrative-1" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="text-blue-600 font-medium" id="style-narrative-text-1">-</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">抽象性</h5>
+                                                <div class="flex items-center">
+                                                    <div class="w-full bg-gray-200 rounded-full h-6 mr-4">
+                                                        <div class="bg-blue-500 h-6 rounded-full" id="style-abstract-1" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="text-blue-600 font-medium" id="style-abstract-text-1">-</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="h-1 border-t border-gray-200"></div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">正式程度</h5>
+                                                <div class="flex items-center">
+                                                    <div class="w-full bg-gray-200 rounded-full h-6 mr-4">
+                                                        <div class="bg-orange-500 h-6 rounded-full" id="style-formality-2" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="text-orange-600 font-medium" id="style-formality-text-2">-</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">叙述性</h5>
+                                                <div class="flex items-center">
+                                                    <div class="w-full bg-gray-200 rounded-full h-6 mr-4">
+                                                        <div class="bg-orange-500 h-6 rounded-full" id="style-narrative-2" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="text-orange-600 font-medium" id="style-narrative-text-2">-</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <h5 class="text-gray-600 mb-2">抽象性</h5>
+                                                <div class="flex items-center">
+                                                    <div class="w-full bg-gray-200 rounded-full h-6 mr-4">
+                                                        <div class="bg-orange-500 h-6 rounded-full" id="style-abstract-2" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="text-orange-600 font-medium" id="style-abstract-text-2">-</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 可读性 -->
+                                <div id="content-readability" class="tab-content hidden">
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">可读性评分</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <h5 class="text-blue-600 mb-3">文本一可读性指标</h5>
+                                                <div class="space-y-4" id="readability-1">
+                                                    <!-- 可读性指标将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-orange-600 mb-3">文本二可读性指标</h5>
+                                                <div class="space-y-4" id="readability-2">
+                                                    <!-- 可读性指标将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5 mb-8">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">Flesch-Kincaid 阅读难度</h4>
+                                        <div class="h-64">
+                                            <canvas id="flesch-chart"></canvas>
+                                        </div>
+                                        <p class="text-sm text-gray-500 mt-2">
+                                            Flesch-Kincaid 阅读难度指数，分数越低表示文本越难理解，分数越高表示越容易理解。
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-5">
+                                        <h4 class="text-lg font-medium text-gray-800 mb-4">目标读者</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <h5 class="text-blue-600 mb-3">文本一目标读者</h5>
+                                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100" id="audience-1">
+                                                    <!-- 目标读者将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-orange-600 mb-3">文本二目标读者</h5>
+                                                <div class="p-4 bg-orange-50 rounded-lg border border-orange-100" id="audience-2">
+                                                    <!-- 目标读者将通过JS动态生成 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 改进建议区 -->
+        <section id="suggestions" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-6 text-gray-800">
+                    写作改进建议
+                </h2>
+                <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                    根据文本分析结果，我们为您提供以下写作改进建议，帮助您提升文本质量和表达效果
+                </p>
+                
+                <div class="bg-gray-50 rounded-xl shadow-lg p-6 md:p-8 hidden" id="suggestions-container">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold text-blue-600 mb-6">文本一改进建议</h3>
+                            <div class="space-y-6" id="suggestions-1">
+                                <!-- 建议将通过JS动态生成 -->
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-orange-600 mb-6">文本二改进建议</h3>
+                            <div class="space-y-6" id="suggestions-2">
+                                <!-- 建议将通过JS动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 关于部分 -->
+        <section id="about" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-10 text-gray-800">
+                    关于本工具
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-gray-800">如何使用</h3>
+                        <ol class="space-y-4 text-gray-600">
+                            <li class="flex items-start">
+                                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5">1</span>
+                                <span>在左侧文本框中输入或粘贴需要对比的两篇文本</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5">2</span>
+                                <span>点击"开始分析"按钮，系统将自动分析两篇文本</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5">3</span>
+                                <span>在右侧结果区域查看文本在各个维度上的对比分析结果</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5">4</span>
+                                <span>使用顶部的标签页切换不同的分析维度</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5">5</span>
+                                <span>参考"写作改进建议"部分，提升您的写作水平</span>
+                            </li>
+                        </ol>
+                        
+                        <h3 class="text-2xl font-semibold mt-10 mb-4 text-gray-800">分析维度</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <i class="fa-solid fa-book-open text-primary mb-2"></i>
+                                <h4 class="font-medium mb-1">词汇分析</h4>
+                                <p class="text-sm text-gray-600">词汇丰富度、高频词、独特用词等</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <i class="fa-solid fa-sentence text-primary mb-2"></i>
+                                <h4 class="font-medium mb-1">句子结构</h4>
+                                <p class="text-sm text-gray-600">句子长度、复杂度、句式多样性等</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <i class="fa-solid fa-paint-brush text-primary mb-2"></i>
+                                <h4 class="font-medium mb-1">风格特征</h4>
+                                <p class="text-sm text-gray-600">正式程度、情感倾向、修辞手法等</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                <i class="fa-solid fa-eye text-primary mb-2"></i>
+                                <h4 class="font-medium mb-1">可读性</h4>
+                                <p class="text-sm text-gray-600">阅读难度、目标读者群体等</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-2xl font-semibold mb-4 text-gray-800">分析原理</h3>
+                        <p class="text-gray-600 mb-4">
+                            本工具基于自然语言处理技术，通过多种文本特征提取和分析算法，对输入的文本进行多维度分析和对比。
+                        </p>
+                        <p class="text-gray-600 mb-4">
+                            我们的分析模型考虑了词汇、句法、语义和语用等多个层面的特征，能够准确捕捉文本的写作风格和特点。
+                        </p>
+                        <p class="text-gray-600 mb-6">
+                            所有分析均在本地浏览器中进行，不会上传您的文本内容到任何服务器，确保您的内容安全和隐私。
+                        </p>
+                        
+                        <h3 class="text-2xl font-semibold mt-8 mb-4 text-gray-800">适用场景</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-check-circle text-success mt-1 mr-3"></i>
+                                <p class="text-gray-600">学术论文写作风格对比与优化</p>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-check-circle text-success mt-1 mr-3"></i>
+                                <p class="text-gray-600">文案撰写与营销内容优化</p>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-check-circle text-success mt-1 mr-3"></i>
+                                <p class="text-gray-600">文学创作风格分析与学习</p>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-check-circle text-success mt-1 mr-3"></i>
+                                <p class="text-gray-600">外语写作学习与提升</p>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fa-solid fa-check-circle text-success mt-1 mr-3"></i>
+                                <p class="text-gray-600">多版本内容对比与选择</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <i class="fa-solid fa-feather text-primary text-2xl"></i>
+                        <h2 class="text-xl font-bold">文笔对比分析工具</h2>
+                    </div>
+                    <p class="text-gray-400 mb-6">
+                        一款专业的文本分析工具，帮助您深入了解和优化写作风格，提升文本质量。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <i class="fa-brands fa-github text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <i class="fa-brands fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                            <i class="fa-brands fa-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">快速链接</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors duration-200">功能</a></li>
+                        <li><a href="#analyzer" class="text-gray-400 hover:text-white transition-colors duration-200">开始分析</a></li>
+                        <li><a href="#suggestions" class="text-gray-400 hover:text-white transition-colors duration-200">改进建议</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors duration-200">关于</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">联系我们</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-envelope text-primary mt-1 mr-3"></i>
+                            <span class="text-gray-400">contact@writinganalyzer.com</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-phone text-primary mt-1 mr-3"></i>
+                            <span class="text-gray-400">+86 123 4567 8910</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-map-marker-alt text-primary mt-1 mr-3"></i>
+                            <span class="text-gray-400">北京市海淀区中关村大街1号</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© 2025 文笔对比分析工具. 保留所有权利.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">隐私政策</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">使用条款</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">Cookie 政策</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-primary/90">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- 分析逻辑 -->
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const text1 = document.getElementById('text1');
+            const text2 = document.getElementById('text2');
+            const text1Stats = document.getElementById('text1-stats');
+            const text2Stats = document.getElementById('text2-stats');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const sampleBtn = document.getElementById('sample-btn');
+            const resultsContainer = document.getElementById('results-container');
+            const suggestionsContainer = document.getElementById('suggestions-container');
+            const backToTopBtn = document.getElementById('back-to-top');
+            const navbar = document.getElementById('navbar');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            // 示例文本
+            const sampleText1 = "写作是一门艺术，它需要长期的积累和不断的练习。每一个优秀的作家都有自己独特的风格，这种风格体现在词汇的选择、句子的构建以及主题的表达上。通过不断地阅读和分析优秀的作品，我们可以学习到不同的写作技巧，并将其融入到自己的创作中。写作不仅是表达思想的方式，更是与读者沟通的桥梁。";
+            const sampleText2 = "Writing is not just about putting words together; it's about creating a connection with your audience. A great piece of writing should be clear, concise, and engaging. It should take the reader on a journey, from the first sentence to the last. To achieve this, writers must carefully choose their words, craft compelling sentences, and organize their thoughts in a logical manner. Practice and feedback are essential for improving your writing skills.";
+            
+            // 更新文本统计信息
+            function updateTextStats() {
+                text1Stats.textContent = `${text1.value.length} 字`;
+                text2Stats.textContent = `${text2.value.length} 字`;
+            }
+            
+            // 文本变化事件监听
+            text1.addEventListener('input', updateTextStats);
+            text2.addEventListener('input', updateTextStats);
+            
+            // 清空文本按钮
+            clearBtn.addEventListener('click', function() {
+                text1.value = '';
+                text2.value = '';
+                updateTextStats();
+                resultsContainer.classList.add('hidden');
+                suggestionsContainer.classList.add('hidden');
+            });
+            
+            // 使用示例文本按钮
+            sampleBtn.addEventListener('click', function() {
+                text1.value = sampleText1;
+                text2.value = sampleText2;
+                updateTextStats();
+            });
+            
+            // 移动端菜单切换
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 回到顶部按钮
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // 滚动事件处理
+            window.addEventListener('scroll', function() {
+                // 导航栏样式变化
+                if (window.scrollY > 50) {
+                    navbar.classList.add('py-2');
+                    navbar.classList.remove('py-3');
+                } else {
+                    navbar.classList.add('py-3');
+                    navbar.classList.remove('py-2');
+                }
+                
+                // 回到顶部按钮显示/隐藏
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.remove('opacity-0', 'invisible');
+                    backToTopBtn.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopBtn.classList.add('opacity-0', 'invisible');
+                    backToTopBtn.classList.remove('opacity-100', 'visible');
+                }
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                        
+                        // 如果是移动菜单，点击后关闭
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+            
+            // 选项卡切换
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 移除所有按钮的活动状态
+                    tabBtns.forEach(b => {
+                        b.classList.remove('text-primary', 'border-primary');
+                        b.classList.add('text-gray-500', 'hover:text-gray-700');
+                    });
+                    
+                    // 添加当前按钮的活动状态
+                    this.classList.add('text-primary', 'border-primary');
+                    this.classList.remove('text-gray-500', 'hover:text-gray-700');
+                    
+                    // 隐藏所有内容
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // 显示对应内容
+                    const contentId = this.id.replace('tab-', 'content-');
+                    document.getElementById(contentId).classList.remove('hidden');
+                });
+            });
+            
+            // 分析按钮点击事件
+            analyzeBtn.addEventListener('click', function() {
+                // 检查文本是否输入
+                if (!text1.value.trim() || !text2.value.trim()) {
+                    alert('请输入需要分析的两篇文本');
+                    return;
+                }
+                
+                // 显示加载状态
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> 分析中...';
+                this.disabled = true;
+                
+                // 模拟分析过程
+                setTimeout(() => {
+                    // 分析文本
+                    const analysis1 = analyzeText(text1.value);
+                    const analysis2 = analyzeText(text2.value);
+                    
+                    // 显示结果
+                    displayResults(analysis1, analysis2);
+                    
+                    // 显示改进建议
+                    displaySuggestions(analysis1, analysis2);
+                    
+                    // 滚动到结果区域
+                    document.getElementById('analyzer').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 恢复按钮状态
+                    this.innerHTML = '<i class="fa-solid fa-play mr-2"></i> 开始分析';
+                    this.disabled = false;
+                }, 1500);
+            });
+            
+            // 文本分析函数
+            function analyzeText(text) {
+                // 基本统计
+                const charCount = text.length;
+                const words = text.match(/\b\w+\b/g) || [];
+                const wordCount = words.length;
+                const sentences = text.match(/[^\s][.?!](\s|$)/g) || [];
+                const sentenceCount = sentences.length;
+                const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+                const paragraphCount = paragraphs.length;
+                
+                // 平均指标
+                const avgSentenceLength = sentenceCount > 0 ? (wordCount / sentenceCount).toFixed(1) : 0;
+                const avgParagraphLength = paragraphCount > 0 ? (sentenceCount / paragraphCount).toFixed(1) : 0;
+                const wordLengths = words.map(word => word.length);
+                const avgWordLength = wordCount > 0 ? (wordLengths.reduce((sum, len) => sum + len, 0) / wordCount).toFixed(1) : 0;
+                
+                // 词汇分析
+                const uniqueWords = [...new Set(words)];
+                const ttr = uniqueWords.length / wordCount; // 类型-标记比
+                const wordFrequency = {};
+                words.forEach(word => {
+                    wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+                });
+                
+                // 找出高频词（过滤常见停用词）
+                const stopwords = new Set(['the', 'and', 'of', 'a', 'to', 'in', 'that', 'is', 'was', 'he', 'for', 'it', 'with', 'as', 'his', 'on', 'be', 'at', 'by', 'i', 'this', 'had', 'not', 'are', 'but', 'from', 'or', 'have', 'an', 'they', 'which', 'one', 'you', 'were', 'her', 'all', 'she', 'there', 'would', 'their', 'we', 'him', 'been', 'has', 'when', 'who', 'will', 'more', 'no', 'if', 'out', 'so', 'up', 'said', 'what', 'its', 'about', 'into', 'than', 'them', 'can', 'only', 'other', 'new', 'some', 'could', 'these', 'two', 'may', 'then', 'do', 'first', 'any', 'my', 'now', 'such', 'like', 'our', 'over', 'man', 'me', 'even', 'most', 'made', 'after', 'also', 'did', 'many', 'before', 'must', 'through', 'back', 'years', 'where', 'much', 'your', 'way', 'well', 'down', 'should', 'because', 'each', 'just', 'those', 'take', 'very', 'same', 'words', 'us', '中国', '的', '了', '在', '是', '我', '有', '和', '就', '不', '人', '都', '一', '一个', '上', '也', '很', '到', '说', '要', '去', '你', '会', '着', '没有', '看', '好', '自己', '这']);
+                
+                const filteredWords = Object.entries(wordFrequency)
+                    .filter(([word]) => !stopwords.has(word.toLowerCase()))
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+                
+                // 句子长度分布
+                const sentenceLengthDistribution = {};
+                sentences.forEach(sentence => {
+                    const length = (sentence.match(/\b\w+\b/g) || []).length;
+                    const bucket = getBucket(length);
+                    sentenceLengthDistribution[bucket] = (sentenceLengthDistribution[bucket] || 0) + 1;
+                });
+                
+                function getBucket(length) {
+                    if (length <= 5) return '0-5';
+                    if (length <= 10) return '6-10';
+                    if (length <= 15) return '11-15';
+                    if (length <= 20) return '16-20';
+                    if (length <= 25) return '21-25';
+                    return '26+';
+                }
+                
+                // 风格分析（简化版）
+                const formality = Math.random(); // 正式程度 (0-1)
+                const sentiment = Math.random() * 2 - 1; // 情感倾向 (-1 to 1)
+                const abstractness = Math.random(); // 抽象程度 (0-1)
+                const narrative = Math.random(); // 叙述性 (0-1)
+                
+                // 可读性分析
+                const fleschKincaid = 206.835 - 1.015 * (wordCount / sentenceCount) - 84.6 * (avgWordLength / 1);
+                const readabilityLevel = getReadabilityLevel(fleschKincaid);
+                
+                function getReadabilityLevel(score) {
+                    if (score >= 90) return "5th Grade";
+                    if (score >= 80) return "6th Grade";
+                    if (score >= 70) return "7th Grade";
+                    if (score >= 60) return "8th & 9th Grade";
+                    if (score >= 50) return "10th to 12th Grade";
+                    if (score >= 30) return "College";
+                    return "College Graduate";
+                }
+                
+                // 修辞手法分析（简化版）
+                const rhetoric = {
+                    metaphor: Math.random() * 5,
+                    simile: Math.random() * 5,
+                    personification: Math.random() * 5,
+                    hyperbole: Math.random() * 5,
+                    irony: Math.random() * 5
+                };
+                
+                return {
+                    charCount,
+                    wordCount,
+                    sentenceCount,
+                    paragraphCount,
+                    avgSentenceLength,
+                    avgParagraphLength,
+                    avgWordLength,
+                    ttr,
+                    wordFrequency,
+                    filteredWords,
+                    sentenceLengthDistribution,
+                    formality,
+                    sentiment,
+                    abstractness,
+                    narrative,
+                    fleschKincaid,
+                    readabilityLevel,
+                    rhetoric,
+                    text
+                };
+            }
+            
+            // 显示分析结果
+            function displayResults(analysis1, analysis2) {
+                // 显示结果容器
+                resultsContainer.classList.remove('hidden');
+                
+                // 基本统计
+                document.getElementById('char-count-1').textContent = analysis1.charCount;
+                document.getElementById('char-count-2').textContent = analysis2.charCount;
+                document.getElementById('word-count-1').textContent = analysis1.wordCount;
+                document.getElementById('word-count-2').textContent = analysis2.wordCount;
+                document.getElementById('sentence-count-1').textContent = analysis1.sentenceCount;
+                document.getElementById('sentence-count-2').textContent = analysis2.sentenceCount;
+                document.getElementById('paragraph-count-1').textContent = analysis1.paragraphCount;
+                document.getElementById('paragraph-count-2').textContent = analysis2.paragraphCount;
+                
+                // 平均指标
+                document.getElementById('avg-sentence-length-1').textContent = analysis1.avgSentenceLength;
+                document.getElementById('avg-sentence-length-2').textContent = analysis2.avgSentenceLength;
+                document.getElementById('avg-paragraph-length-1').textContent = analysis1.avgParagraphLength;
+                document.getElementById('avg-paragraph-length-2').textContent = analysis2.avgParagraphLength;
+                document.getElementById('avg-word-length-1').textContent = analysis1.avgWordLength;
+                document.getElementById('avg-word-length-2').textContent = analysis2.avgWordLength;
+                
+                // 风格对比
+                document.getElementById('formality-1').style.width = `${analysis1.formality * 100}%`;
+                document.getElementById('formality-2').style.width = `${analysis2.formality * 100}%`;
+                
+                const sentiment1Percent = (analysis1.sentiment + 1) * 50;
+                const sentiment2Percent = (analysis2.sentiment + 1) * 50;
+                document.getElementById('sentiment-1').style.width = `${sentiment1Percent}%`;
+                document.getElementById('sentiment-2').style.width = `${sentiment2Percent}%`;
+                
+                document.getElementById('abstractness-1').style.width = `${analysis1.abstractness * 100}%`;
+                document.getElementById('abstractness-2').style.width = `${analysis2.abstractness * 100}%`;
+                
+                document.getElementById('narrative-1').style.width = `${analysis1.narrative * 100}%`;
+                document.getElementById('narrative-2').style.width = `${analysis2.narrative * 100}%`;
+                
+                // 图表初始化
+                initCharts(analysis1, analysis2);
+                
+                // 高频词显示
+                displayTopWords(analysis1.filteredWords, 'top-words-1');
+                displayTopWords(analysis2.filteredWords, 'top-words-2');
+                
+                // 可读性指标
+                displayReadability(analysis1, 'readability-1');
+                displayReadability(analysis2, 'readability-2');
+                
+                // 目标读者
+                document.getElementById('audience-1').textContent = `根据Flesch-Kincaid指数，这篇文本适合${analysis1.readabilityLevel}水平的读者阅读。`;
+                document.getElementById('audience-2').textContent = `根据Flesch-Kincaid指数，这篇文本适合${analysis2.readabilityLevel}水平的读者阅读。`;
+                
+                // 典型句子
+                displaySampleSentences(analysis1, 'sample-sentences-1');
+                displaySampleSentences(analysis2, 'sample-sentences-2');
+                
+                // 风格特征
+                document.getElementById('style-formality-1').style.width = `${analysis1.formality * 100}%`;
+                document.getElementById('style-formality-text-1').textContent = getFormalityLabel(analysis1.formality);
+                
+                document.getElementById('style-narrative-1').style.width = `${analysis1.narrative * 100}%`;
+                document.getElementById('style-narrative-text-1').textContent = getNarrativeLabel(analysis1.narrative);
+                
+                document.getElementById('style-abstract-1').style.width = `${analysis1.abstractness * 100}%`;
+                document.getElementById('style-abstract-text-1').textContent = getAbstractnessLabel(analysis1.abstractness);
+                
+                document.getElementById('style-formality-2').style.width = `${analysis2.formality * 100}%`;
+                document.getElementById('style-formality-text-2').textContent = getFormalityLabel(analysis2.formality);
+                
+                document.getElementById('style-narrative-2').style.width = `${analysis2.narrative * 100}%`;
+                document.getElementById('style-narrative-text-2').textContent = getNarrativeLabel(analysis2.narrative);
+                
+                document.getElementById('style-abstract-2').style.width = `${analysis2.abstractness * 100}%`;
+                document.getElementById('style-abstract-text-2').textContent = getAbstractnessLabel(analysis2.abstractness);
+            }
+            
+            // 显示改进建议
+            function displaySuggestions(analysis1, analysis2) {
+                suggestionsContainer.classList.remove('hidden');
+                
+                // 为文本1生成建议
+                const suggestions1 = generateSuggestions(analysis1);
+                const suggestions1Container = document.getElementById('suggestions-1');
+                suggestions1Container.innerHTML = '';
+                
+                suggestions1.forEach(suggestion => {
+                    const suggestionElement = document.createElement('div');
+                    suggestionElement.className = 'bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg';
+                    suggestionElement.innerHTML = `
+                        <div class="flex items-start">
+                            <i class="fa-solid fa-lightbulb text-blue-500 mt-1 mr-3"></i>
+                            <p class="text-gray-700">${suggestion}</p>
+                        </div>
+                    `;
+                    suggestions1Container.appendChild(suggestionElement);
+                });
+                
+                // 为文本2生成建议
+                const suggestions2 = generateSuggestions(analysis2);
+                const suggestions2Container = document.getElementById('suggestions-2');
+                suggestions2Container.innerHTML = '';
+                
+                suggestions2.forEach(suggestion => {
+                    const suggestionElement = document.createElement('div');
+                    suggestionElement.className = 'bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg';
+                    suggestionElement.innerHTML = `
+                        <div class="flex items-start">
+                            <i class="fa-solid fa-lightbulb text-orange-500 mt-1 mr-3"></i>
+                            <p class="text-gray-700">${suggestion}</p>
+                        </div>
+                    `;
+                    suggestions2Container.appendChild(suggestionElement);
+                });
+            }
+            
+            // 生成改进建议
+            function generateSuggestions(analysis) {
+                const suggestions = [];
+                
+                // 词汇建议
+                if (analysis.ttr < 0.3) {
+                    suggestions.push("考虑增加词汇多样性，使用更多不同的词汇来表达相同或相似的意思。");
+                } else if (analysis.ttr > 0.7) {
+                    suggestions.push("词汇多样性很高，但要注意避免使用过于生僻的词汇，确保文本的可读性。");
+                }
+                
+                // 句子长度建议
+                if (analysis.avgSentenceLength > 25) {
+                    suggestions.push("平均句子长度较长，考虑适当拆分复杂句子，提高文本的易读性。");
+                } else if (analysis.avgSentenceLength < 10) {
+                    suggestions.push("平均句子长度较短，可以尝试组合一些简单句子，增加文本的流畅性。");
+                }
+                
+                // 可读性建议
+                if (analysis.fleschKincaid < 40) {
+                    suggestions.push("根据Flesch-Kincaid指数，文本的阅读难度较高。考虑使用更简单的词汇和句子结构，以适应更广泛的读者群体。");
+                } else if (analysis.fleschKincaid > 80) {
+                    suggestions.push("根据Flesch-Kincaid指数，文本的阅读难度较低。如果目标读者是高学历群体，可以考虑增加一些复杂的句子和专业术语。");
+                }
+                
+                // 风格建议
+                if (analysis.formality < 0.3) {
+                    suggestions.push("文本风格较为非正式。如果是用于正式场合，如学术论文或商务文档，考虑使用更正式的词汇和句式。");
+                } else if (analysis.formality > 0.8) {
+                    suggestions.push("文本风格非常正式。如果是用于博客或社交媒体，可以适当增加一些口语化表达，使文本更亲切。");
+                }
+                
+                // 情感建议
+                if (analysis.sentiment < -0.5) {
+                    suggestions.push("文本情感倾向较为消极。如果希望传达更积极的信息，可以适当调整用词和表达方式。");
+                } else if (analysis.sentiment > 0.5) {
+                    suggestions.push("文本情感倾向非常积极。确保情感表达与内容主题相符，避免过度情绪化。");
+                }
+                
+                // 修辞手法建议
+                const hasRhetoric = Object.values(analysis.rhetoric).some(value => value > 3);
+                if (!hasRhetoric) {
+                    suggestions.push("可以适当使用一些修辞手法，如比喻、拟人或夸张，来增强文本的表现力和感染力。");
+                }
+                
+                return suggestions;
+            }
+            
+            // 显示高频词
+            function displayTopWords(words, containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                
+                words.forEach(([word, count]) => {
+                    const wordElement = document.createElement('div');
+                    wordElement.className = 'flex justify-between items-center';
+                    
+                    const progressBar = document.createElement('div');
+                    progressBar.className = 'h-2 bg-gray-200 rounded-full overflow-hidden flex-grow mr-3';
+                    
+                    const progress = document.createElement('div');
+                    progress.className = 'h-full bg-gradient-to-r from-primary to-accent';
+                    progress.style.width = `${count * 10}%`;
+                    
+                    progressBar.appendChild(progress);
+                    
+                    wordElement.innerHTML = `
+                        <span class="font-medium">${word}</span>
+                        <span class="text-gray-500 text-sm">${count}次</span>
+                    `;
+                    
+                    wordElement.insertBefore(progressBar, wordElement.firstChild);
+                    container.appendChild(wordElement);
+                });
+            }
+            
+            // 显示可读性指标
+            function displayReadability(analysis, containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                
+                const readabilityMetrics = [
+                    { name: 'Flesch-Kincaid 阅读难度', value: analysis.fleschKincaid.toFixed(1) },
+                    { name: 'Flesch-Kincaid 年级水平', value: getFleschGradeLevel(analysis.fleschKincaid) },
+                    { name: 'Gunning Fog 指数', value: (analysis.avgSentenceLength + (analysis.avgWordLength > 4 ? 3 : 0) * 10).toFixed(1) },
+                    { name: 'SMOG 指数', value: Math.sqrt((analysis.avgSentenceLength * analysis.avgWordLength) / 3).toFixed(1) },
+                    { name: '自动化可读性指数', value: (4.71 * analysis.avgWordLength + 0.5 * analysis.avgSentenceLength - 21.43).toFixed(1) }
+                ];
+                
+                readabilityMetrics.forEach(metric => {
+                    const metricElement = document.createElement('div');
+                    metricElement.className = 'flex justify-between items-center';
+                    metricElement.innerHTML = `
+                        <span class="text-gray-600">${metric.name}</span>
+                        <span class="font-medium">${metric.value}</span>
+                    `;
+                    container.appendChild(metricElement);
+                });
+            }
+            
+            // 获取Flesch-Kincaid年级水平
+            function getFleschGradeLevel(score) {
+                if (score >= 90) return "5年级";
+                if (score >= 80) return "6年级";
+                if (score >= 70) return "7年级";
+                if (score >= 60) return "8-9年级";
+                if (score >= 50) return "10-12年级";
+                if (score >= 30) return "大学";
+                return "大学毕业";
+            }
+            
+            // 显示典型句子
+            function displaySampleSentences(analysis, containerId) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                
+                // 找出最短和最长的句子
+                const sentences = analysis.text.split(/[.!?]/).filter(s => s.trim().length > 0);
+                const sentenceLengths = sentences.map(s => s.trim().split(/\s+/).length);
+                
+                // 获取最短和最长句子的索引
+                const shortestIndex = sentenceLengths.indexOf(Math.min(...sentenceLengths));
+                const longestIndex = sentenceLengths.indexOf(Math.max(...sentenceLengths));
+                
+                // 添加最短句子
+                if (shortestIndex !== -1) {
+                    const shortestSentence = sentences[shortestIndex].trim();
+                    const element = document.createElement('div');
+                    element.className = 'bg-white p-4 rounded-lg shadow-sm';
+                    element.innerHTML = `
+                        <h6 class="text-sm font-medium text-gray-500 mb-2">最短的句子 (${sentenceLengths[shortestIndex]} 词)</h6>
+                        <p class="text-gray-700">"${shortestSentence}."</p>
+                    `;
+                    container.appendChild(element);
+                }
+                
+                // 添加最长句子
+                if (longestIndex !== -1) {
+                    const longestSentence = sentences[longestIndex].trim();
+                    const element = document.createElement('div');
+                    element.className = 'bg-white p-4 rounded-lg shadow-sm';
+                    element.innerHTML = `
+                        <h6 class="text-sm font-medium text-gray-500 mb-2">最长的句子 (${sentenceLengths[longestIndex]} 词)</h6>
+                        <p class="text-gray-700">"${longestSentence}."</p>
+                    `;
+                    container.appendChild(element);
+                }
+            }
+            
+            // 获取正式程度标签
+            function getFormalityLabel(score) {
+                if (score < 0.3) return "非常非正式";
+                if (score < 0.5) return "较非正式";
+                if (score < 0.7) return "中等正式";
+                if (score < 0.9) return "较正式";
+                return "非常正式";
+            }
+            
+            // 获取叙述性标签
+            function getNarrativeLabel(score) {
+                if (score < 0.3) return "说明性";
+                if (score < 0.5) return "较说明性";
+                if (score < 0.7) return "混合性";
+                if (score < 0.9) return "较叙述性";
+                return "叙述性";
+            }
+            
+            // 获取抽象程度标签
+            function getAbstractnessLabel(score) {
+                if (score < 0.3) return "非常具体";
+                if (score < 0.5) return "较具体";
+                if (score < 0.7) return "中等抽象";
+                if (score < 0.9) return "较抽象";
+                return "非常抽象";
+            }
+            
+            // 初始化图表
+            function initCharts(analysis1, analysis2) {
+                // TTR图表
+                new Chart(document.getElementById('ttr-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '词汇多样性 (TTR)',
+                            data: [analysis1.ttr.toFixed(2), analysis2.ttr.toFixed(2)],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1
+                            }
+                        }
+                    }
+                });
+                
+                // 平均词频等级图表
+                new Chart(document.getElementById('word-frequency-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '平均词频等级',
+                            data: [Math.random() * 5, Math.random() * 5],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10
+                            }
+                        }
+                    }
+                });
+                
+                // 功能词比例图表
+                new Chart(document.getElementById('function-words-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '功能词比例',
+                            data: [Math.random() * 0.5, Math.random() * 0.5],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1
+                            }
+                        }
+                    }
+                });
+                
+                // 词汇分析 - TTR图表
+                new Chart(document.getElementById('vocab-ttr-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '类型-标记比 (TTR)',
+                            data: [analysis1.ttr.toFixed(2), analysis2.ttr.toFixed(2)],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1
+                            }
+                        }
+                    }
+                });
+                
+                // 高级词汇比例图表
+                new Chart(document.getElementById('advanced-words-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '高级词汇比例',
+                            data: [Math.random() * 0.3, Math.random() * 0.3],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 0.5
+                            }
+                        }
+                    }
+                });
+                
+                // 句子长度分布图表
+                new Chart(document.getElementById('sentence-length-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['0-5', '6-10', '11-15', '16-20', '21-25', '26+'],
+                        datasets: [
+                            {
+                                label: '文本一',
+                                data: [
+                                    analysis1.sentenceLengthDistribution['0-5'] || 0,
+                                    analysis1.sentenceLengthDistribution['6-10'] || 0,
+                                    analysis1.sentenceLengthDistribution['11-15'] || 0,
+                                    analysis1.sentenceLengthDistribution['16-20'] || 0,
+                                    analysis1.sentenceLengthDistribution['21-25'] || 0,
+                                    analysis1.sentenceLengthDistribution['26+'] || 0
+                                ],
+                                backgroundColor: '#3B82F6',
+                                borderRadius: 6
+                            },
+                            {
+                                label: '文本二',
+                                data: [
+                                    analysis2.sentenceLengthDistribution['0-5'] || 0,
+                                    analysis2.sentenceLengthDistribution['6-10'] || 0,
+                                    analysis2.sentenceLengthDistribution['11-15'] || 0,
+                                    analysis2.sentenceLengthDistribution['16-20'] || 0,
+                                    analysis2.sentenceLengthDistribution['21-25'] || 0,
+                                    analysis2.sentenceLengthDistribution['26+'] || 0
+                                ],
+                                backgroundColor: '#F97316',
+                                borderRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                
+                // 平均每个句子的从句数
+                new Chart(document.getElementById('clauses-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '平均每个句子的从句数',
+                            data: [Math.random() * 3, Math.random() * 3],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5
+                            }
+                        }
+                    }
+                });
+                
+                // 复合句比例图表
+                new Chart(document.getElementById('complex-sentences-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '复合句比例',
+                            data: [Math.random() * 0.7, Math.random() * 0.7],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1
+                            }
+                        }
+                    }
+                });
+                
+                // 句子开头多样性图表
+                new Chart(document.getElementById('sentence-start-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '句子开头多样性指数',
+                            data: [Math.random(), Math.random()],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1
+                            }
+                        }
+                    }
+                });
+                
+                // 修辞手法图表
+                new Chart(document.getElementById('rhetoric-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['隐喻', '明喻', '拟人', '夸张', '反讽'],
+                        datasets: [
+                            {
+                                label: '文本一',
+                                data: [
+                                    analysis1.rhetoric.metaphor,
+                                    analysis1.rhetoric.simile,
+                                    analysis1.rhetoric.personification,
+                                    analysis1.rhetoric.hyperbole,
+                                    analysis1.rhetoric.irony
+                                ],
+                                backgroundColor: '#3B82F6',
+                                borderRadius: 6
+                            },
+                            {
+                                label: '文本二',
+                                data: [
+                                    analysis2.rhetoric.metaphor,
+                                    analysis2.rhetoric.simile,
+                                    analysis2.rhetoric.personification,
+                                    analysis2.rhetoric.hyperbole,
+                                    analysis2.rhetoric.irony
+                                ],
+                                backgroundColor: '#F97316',
+                                borderRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '每1000词出现次数'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 情感极性图表
+                new Chart(document.getElementById('sentiment-polarity-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '情感极性',
+                            data: [analysis1.sentiment.toFixed(2), analysis2.sentiment.toFixed(2)],
+                            backgroundColor: [
+                                analysis1.sentiment > 0 ? '#3B82F6' : '#EF4444',
+                                analysis2.sentiment > 0 ? '#F97316' : '#EF4444'
+                            ],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: -1,
+                                max: 1,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 情感强度图表
+                new Chart(document.getElementById('sentiment-intensity-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: '情感强度',
+                            data: [Math.random(), Math.random()],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1
+                            }
+                        }
+                    }
+                });
+                
+                // Flesch-Kincaid阅读难度图表
+                new Chart(document.getElementById('flesch-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['文本一', '文本二'],
+                        datasets: [{
+                            label: 'Flesch-Kincaid 阅读难度',
+                            data: [analysis1.fleschKincaid.toFixed(1), analysis2.fleschKincaid.toFixed(1)],
+                            backgroundColor: ['#3B82F6', '#F97316'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 0,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+    

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>初中英语作文常用词组连连看</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        #game-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            width: 90%;
+            max-width: 800px;
+            margin-bottom: 24px;
+        }
+
+        #level-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        #game-board {
+            display: grid;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .card {
+            background-color: #e9e9f4;
+            border: none;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .card:hover {
+            background-color: #d7d7e9;
+            transform: scale(1.05);
+        }
+
+        .selected {
+            background-color: #c7e8ff;
+        }
+
+        #message {
+            font-size: 20px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        #restart {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #restart:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="level-display">当前关卡: 1</div>
+        <div id="game-board"></div>
+        <div id="message"></div>
+    </div>
+    <button id="restart">重新开始</button>
+    <script>
+        const phrases = [
+            // 简单难度
+            { en: "in the morning", cn: "在早上", level: 1 },
+            { en: "go to school", cn: "去上学", level: 1 },
+            { en: "have breakfast", cn: "吃早饭", level: 1 },
+            { en: "go home", cn: "回家", level: 1 },
+            { en: "watch TV", cn: "看电视", level: 1 },
+            { en: "go to bed", cn: "去睡觉", level: 1 },
+            { en: "a lot of", cn: "许多", level: 1 },
+            { en: "kind of", cn: "有点儿", level: 1 },
+            { en: "of course", cn: "当然", level: 1 },
+            { en: "all over the world", cn: "全世界", level: 1 },
+            // 中等难度
+            { en: "on weekends", cn: "在周末", level: 2 },
+            { en: "take a walk", cn: "散步", level: 2 },
+            { en: "play football", cn: "踢足球", level: 2 },
+            { en: "in front of", cn: "在……前面", level: 2 },
+            { en: "be good at", cn: "擅长", level: 2 },
+            { en: "make friends", cn: "交朋友", level: 2 },
+            { en: "look forward to", cn: "期待", level: 2 },
+            { en: "come true", cn: "实现", level: 2 },
+            { en: "in the future", cn: "在未来", level: 2 },
+            { en: "at least", cn: "至少", level: 2 },
+            // 困难难度
+            { en: "for example", cn: "例如", level: 3 },
+            { en: "in fact", cn: "事实上", level: 3 },
+            { en: "take care of", cn: "照顾", level: 3 },
+            { en: "be interested in", cn: "对……感兴趣", level: 3 },
+            { en: "pay attention to", cn: "注意", level: 3 },
+            { en: "as a result", cn: "结果", level: 3 },
+            { en: "give up", cn: "放弃", level: 3 },
+            { en: "deal with", cn: "处理", level: 3 },
+            { en: "in addition", cn: "此外", level: 3 },
+            { en: "at the same time", cn: "同时", level: 3 }
+        ];
+
+        const gameBoard = document.getElementById('game-board');
+        const message = document.getElementById('message');
+        const restartButton = document.getElementById('restart');
+        const levelDisplay = document.getElementById('level-display');
+        let cards = [];
+        let selectedCards = [];
+        let matchedPairs = 0;
+        let currentLevel = 1;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createCards() {
+            const levelPhrases = phrases.filter(phrase => phrase.level === currentLevel);
+            const allItems = [];
+            levelPhrases.forEach(phrase => {
+                allItems.push({ type: 'en', value: phrase.en });
+                allItems.push({ type: 'cn', value: phrase.cn });
+            });
+            shuffle(allItems);
+
+            const cols = currentLevel === 1? 4 : currentLevel === 2? 5 : 6;
+            gameBoard.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            gameBoard.innerHTML = '';
+            allItems.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.textContent = item.value;
+                card.dataset.type = item.type;
+                card.dataset.value = item.value;
+                card.addEventListener('click', handleCardClick);
+                gameBoard.appendChild(card);
+                cards.push(card);
+            });
+        }
+
+        function handleCardClick() {
+            if (selectedCards.length < 2 && !this.classList.contains('selected')) {
+                this.classList.add('selected');
+                selectedCards.push(this);
+                if (selectedCards.length === 2) {
+                    const card1 = selectedCards[0];
+                    const card2 = selectedCards[1];
+                    if (
+                        (card1.dataset.type === 'en' && card2.dataset.type === 'cn' ||
+                            card1.dataset.type === 'cn' && card2.dataset.type === 'en') &&
+                        phrases.some(phrase =>
+                            (phrase.en === card1.dataset.value && phrase.cn === card2.dataset.value) ||
+                            (phrase.en === card2.dataset.value && phrase.cn === card1.dataset.value)
+                        )
+                    ) {
+                        card1.style.visibility = 'hidden';
+                        card2.style.visibility = 'hidden';
+                        matchedPairs++;
+                        if (matchedPairs === phrases.filter(phrase => phrase.level === currentLevel).length) {
+                            if (currentLevel < 3) {
+                                currentLevel++;
+                                levelDisplay.textContent = `当前关卡: ${currentLevel}`;
+                                message.textContent = '恭喜，进入下一关！';
+                                setTimeout(() => {
+                                    cards = [];
+                                    selectedCards = [];
+                                    matchedPairs = 0;
+                                    createCards();
+                                    message.textContent = '';
+                                }, 2000);
+                            } else {
+                                message.textContent = '恭喜你，完成所有关卡！';
+                            }
+                        }
+                    } else {
+                        setTimeout(() => {
+                            card1.classList.remove('selected');
+                            card2.classList.remove('selected');
+                        }, 1000);
+                    }
+                    selectedCards = [];
+                }
+            }
+        }
+
+        function restartGame() {
+            currentLevel = 1;
+            levelDisplay.textContent = `当前关卡: ${currentLevel}`;
+            gameBoard.innerHTML = '';
+            cards = [];
+            selectedCards = [];
+            matchedPairs = 0;
+            message.textContent = '';
+            createCards();
+        }
+
+        createCards();
+        restartButton.addEventListener('click', restartGame);
+    </script>
+<script src="sfx.js"></script>
+</body>
+
+</html>
+    
